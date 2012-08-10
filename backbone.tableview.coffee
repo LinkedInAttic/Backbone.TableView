@@ -26,7 +26,7 @@ class Backbone.TableView extends Backbone.View
         </ul>
     """
     dataTemplate: _.template """
-        <% _.each(collection.models, function (row, i) { %>
+        <% _.each(collection.models, function (row) { %>
             <tr>
                 <% _.each(columns, function (col, name) { %>
                     <td class="<%= col.className || "" %>">
