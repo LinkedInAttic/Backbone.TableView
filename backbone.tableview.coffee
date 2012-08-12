@@ -1,18 +1,8 @@
 class Backbone.TableView extends Backbone.View
     tagName: "div"
     titleTemplate: _.template "<h2><%= model %></h2>"
-    filtersTemplate: _.template """
-        <% _.each(model, function (filter) { %>
-            <%= filter %>
-        <% }) %>
-    """
     searchTemplate: _.template """
         <input type="text" class="search-query pull-right" placeholder="<%= model.detail || model %>"></input>
-    """
-    inputTemplate: _.template """
-        <div class="input-prepend inline">
-            <span class="add-on"><%= name %></span><input id="<%= id %>" type="text" class="filter <%= className %>" value="<%= init %>"></input>
-        </div>
     """
     paginationTemplate: _.template """
         <ul class="pager">
@@ -47,8 +37,7 @@ class Backbone.TableView extends Backbone.View
                 <%= title %>
             </div>
 
-            <div class="controls pagination-centered span8">
-                <%= filters %>
+            <div class="filters controls pagination-centered span8">
             </div>
 
             <div class="span2">
@@ -76,96 +65,89 @@ class Backbone.TableView extends Backbone.View
         <%= pagination %>
     """
     events:
-        "keypress .search-query": "updateOnEnter"
-        "change   .filter":       "update"
+        "keypress .search-query": "updateSearchOnEnter"
         "click    .pager-prev":   "prevPage"
         "click    .pager-next":   "nextPage"
         "click    th":            "toggleSort"
 
     initialize: ->
         @collection.on "reset", @renderData
-        @page = @page or 1
-        @size = @size or 10
+        @data = @options.initialData or @initialData or {}
+        @data.page = @options.page or @page or 1
+        @data.size = @options.size or @size or 10
         return @
 
-    printFilter: (name, filter) =>
+    setData: (id, val) =>
+        @data[id] = val
+        @update()
+
+    createFilter: (name, filter) =>
         switch filter.type
             when "input"
-                return @inputTemplate
-                    name: @capitalize(name)
-                    id: "filter" + name
+                return new InputFilter
+                    id: name
                     init: filter.init or ""
-                    className: filter.className or ""
-        return ""
+                    className: "input-prepend inline"
+                    filterClass: filter.className or ""
+                    get: filter.get or _.identity
+                    setData: @setData
+        # For custom filters, we just provide the setData function
+        filter.setData = @setData
+        return filter
 
-    updateOnEnter: (e) =>
-        if e.keyCode == 13 then @update()
+    updateSearchOnEnter: (e) =>
+        if e.keyCode == 13
+            val = e.currentTarget.value
+            if val
+                @data[@search.query or "q"] = val
+            else
+                delete @data[@search.query or "q"]
+            @update()
         return @
 
     update: =>
-        data = {}
-        for key, val of @initialData
-            data[key] = val
-        for filter, options of @filters
-            field = $("#filter" + filter, @$el)
-            if field
-                val = field.val()
-                data[filter] = (options.get? and options.get(val)) or val
-        if @search
-            data[@search.query or "q"] = $(".search-query", @$el).val()
-        if @sortDir and @sortCol
-            data.sort_dir = @sortDir
-            data.sort_col = @sortCol
-        data.page = @page
-        data.size = @size
-        @collection.fetch data: data
+        @collection.fetch data: @data
         return @
 
-    capitalize: (str) ->
-        str.charAt(0).toUpperCase() + str.substring(1).toLowerCase()
-
     renderData: =>
-        $elData = $("tbody", @$el)
-        if $elData
-            $elData.html @dataTemplate
-                collection: @collection
-                columns:    @columns
-                empty:      @empty or ""
-        $(".page", @$el).html @page
+        $("tbody", @$el).html @dataTemplate
+            collection: @collection
+            columns:    @columns
+            empty:      @empty or "No records to show"
         return @
 
     prevPage: =>
-        @page = @page - 1
-        if @page < 1
-            @page = 1
-        else
+        if @data.page > 1
+            @data.page = @data.page - 1
+            $(".page", @$el).html @data.page
             @update()
 
     nextPage: =>
         # Since we don't have a collection count, for now we use the size of
         # the last GET as an heuristic to limit the use of nextPage
-        if @collection.length == @size
-            @page = @page + 1
+        if @collection.length == @data.size
+            @data.page = @data.page + 1
+            $(".page", @$el).html @data.page
             @update()
 
     toggleSort: (e) =>
         el = e.currentTarget
         cl = el.className
         if cl.indexOf("sorting_desc") >= 0
-            @sortDir = "asc"
+            @data.sort_dir = "asc"
             cl = "sorting_asc"
         else if cl.indexOf("sorting") >= 0 or cl.indexOf("sorting_asc") >= 0
-            @sortDir = "desc"
+            @data.sort_dir = "desc"
             cl = "sorting_desc"
         else
             return @
         $("th.sorting_desc, th.sorting_asc", @$el).removeClass("sorting_desc sorting_asc")
         $(el, @$el).addClass(cl)
-        @sortCol = el.abbr
+        @data.sort_col = el.abbr
         @update()
 
     applyTemplate: (template, model) ->
-        (model? and model and template model: model) or ""
+        (model and template model: model) or ""
 
     render: =>
         @$el.html @template
@@ -173,6 +155,37 @@ class Backbone.TableView extends Backbone.View
             empty:      @empty or ""
             title:      @applyTemplate @titleTemplate,      @title
             search:     @applyTemplate @searchTemplate,     @search
-            filters:    @applyTemplate @filtersTemplate,    _.map(@filters, (filter, name) => @printFilter name, filter)
             pagination: @applyTemplate @paginationTemplate, @pagination
+
+        @filters = _.map(@filters, (filter, name) => @createFilter(name, filter))
+        filtersDiv = $(".filters", @$el)
+        _.each @filters, (filter) ->
+            filtersDiv.append filter.render().el
+            filtersDiv.append " "
         @update()
+
+class Filter extends Backbone.View
+    tagName: "div"
+    className: "inline"
+
+    initialize: ->
+        @id = @options.id
+        @setData = @options.setData
+
+    prettyName: (str) ->
+        str.charAt(0).toUpperCase() + str.substring(1).replace(/_(\w)/g, (match, p1) -> " " + p1.toUpperCase())
+
+    render: =>
+        @options.name = @prettyName(@id)
+        @$el.html @template @options
+        return @
+
+class InputFilter extends Filter
+    template: _.template """
+        <span class="add-on"><%= name %></span><input type="text" class="filter <%= filterClass %>" value="<%= init %>"></input>
+    """
+    events:
+        "change .filter": "update"
+
+    update: (e) =>
+        @setData @id, @options.get e.currentTarget.value
