@@ -26,8 +26,8 @@ of filters (see supported filters below):
                     some_weird_formatting_function(model.get('some_text'))
         pagination: true
         search:
-            query: "treeid"
-            detail: "Search by Tree Id"
+            query: "name"
+            detail: "Search by Name"
         filters:
             from:
                 type: "input"
