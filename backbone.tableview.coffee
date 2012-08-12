@@ -115,9 +115,11 @@ class Backbone.TableView extends Backbone.View
     # Binds the collection update event for rendering
     initialize: ->
         @collection.on "reset", @renderData
-        @data = @options.initialData or @initialData or {}
-        @data.page = @options.page or @page or 1
-        @data.size = @options.size or @size or 10
+        for key, val of @options
+            this[key] = val or this[key]
+        @data = @initialData or {}
+        @data.page = @page or 1
+        @data.size = @size or 10
         return @
 
     # Set data and update collection
