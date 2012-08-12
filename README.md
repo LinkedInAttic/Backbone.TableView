@@ -1,6 +1,7 @@
 # Backbone.TableView
 
-Backbone View to render collections as tables
+Backbone View to render collections as tables. Currently it is targeted at
+bootstrap users, in the future it will be more css agnostic.
 
 ## How To Use
 
