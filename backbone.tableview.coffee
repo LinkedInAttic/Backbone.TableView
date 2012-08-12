@@ -125,6 +125,13 @@ class Backbone.TableView extends Backbone.View
     # Creates a filter from a filter config definition
     createFilter: (name, filter) =>
         switch filter.type
+            when "button"
+                return new ButtonFilter
+                    id: name
+                    init: filter.init or "false"
+                    toggle: filter.toggle or "true"
+                    filterClass: filter.className or ""
+                    setData: @setData
             when "input"
                 return new InputFilter
                     id: name
@@ -247,3 +254,19 @@ class InputFilter extends Filter
 
     update: (e) =>
         @setData @id, @options.get e.currentTarget.value
+
+class ButtonFilter extends Filter
+    template: _.template """
+        <button type="button" class="filter btn <%= filterClass %>" data-toggle="button"><%= name %></button>
+    """
+    events:
+        "click .filter": "update"
+
+    initialize: ->
+        super
+        @values = [@options.init, @options.toggle]
+        @current = 0
+
+    update: =>
+        @current = 1 - @current
+        @setData @id, @values[@current]
