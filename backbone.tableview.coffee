@@ -1,3 +1,42 @@
+###
+TableView
+---------
+###
+
+###
+A View that can be used with any backbone collection, and draws a table with it.
+Optionally it supports pagination, search, and any number of filters
+("inputs", "button", "option"). Eg (Users is a Backbone.Collection):
+
+    class UserTableView extends Backbone.TableView
+        title: "My Users Table"
+        collection: new Users()
+        columns:
+            name:
+                header: "My Name"
+            type:
+                header: "Type"
+            last_login:
+                header: "Last Login Time"
+                draw: (model) ->
+                    new Date(model.get 'time')
+            description:
+                header: "Description"
+                nosort: true
+                draw: (model) ->
+                    some_weird_formatting_function(model.get('some_text'))
+        pagination: true
+        search:
+            query: "name"
+            detail: "Search by Name"
+        filters:
+            from:
+                type: "input"
+                className: "date"
+                init: new Date()
+                get: (val) ->
+                    ... process the date val ...
+###
 class Backbone.TableView extends Backbone.View
     tagName: "div"
     titleTemplate: _.template "<h2><%= model %></h2>"
@@ -70,6 +109,7 @@ class Backbone.TableView extends Backbone.View
         "click    .pager-next":   "nextPage"
         "click    th":            "toggleSort"
 
+    # Binds the collection update event for rendering
     initialize: ->
         @collection.on "reset", @renderData
         @data = @options.initialData or @initialData or {}
@@ -77,10 +117,12 @@ class Backbone.TableView extends Backbone.View
         @data.size = @options.size or @size or 10
         return @
 
+    # Set data and update collection
     setData: (id, val) =>
         @data[id] = val
         @update()
 
+    # Creates a filter from a filter config definition
     createFilter: (name, filter) =>
         switch filter.type
             when "input"
@@ -95,6 +137,7 @@ class Backbone.TableView extends Backbone.View
         filter.setData = @setData
         return filter
 
+    # Update collection only if event was trigger by an enter
     updateSearchOnEnter: (e) =>
         if e.keyCode == 13
             val = e.currentTarget.value
@@ -105,10 +148,12 @@ class Backbone.TableView extends Backbone.View
             @update()
         return @
 
+    # Update the collection given all the options/filters
     update: =>
         @collection.fetch data: @data
         return @
 
+    # Render the collection in the tbody section of the table
     renderData: =>
         $("tbody", @$el).html @dataTemplate
             collection: @collection
@@ -116,12 +161,14 @@ class Backbone.TableView extends Backbone.View
             empty:      @empty or "No records to show"
         return @
 
+    # Go to the previous page in the collection
     prevPage: =>
         if @data.page > 1
             @data.page = @data.page - 1
             $(".page", @$el).html @data.page
             @update()
 
+    # Go to the next page in the collection
     nextPage: =>
         # Since we don't have a collection count, for now we use the size of
         # the last GET as an heuristic to limit the use of nextPage
@@ -130,6 +177,7 @@ class Backbone.TableView extends Backbone.View
             $(".page", @$el).html @data.page
             @update()
 
+    # Toggle/Select sort column and direction, and update table accodingly
     toggleSort: (e) =>
         el = e.currentTarget
         cl = el.className
@@ -146,9 +194,13 @@ class Backbone.TableView extends Backbone.View
         @data.sort_col = el.abbr
         @update()
 
+    # Apply a template to a model and return the result (string), or empty
+    # string if model is false/undefined
     applyTemplate: (template, model) ->
         (model and template model: model) or ""
 
+    # Render skeleton of the table, creating filters and other additions,
+    # and trigger an update of the collection
     render: =>
         @$el.html @template
             columns:    @columns
@@ -164,6 +216,11 @@ class Backbone.TableView extends Backbone.View
             filtersDiv.append " "
         @update()
 
+###
+Filters
+-------
+###
+
 class Filter extends Backbone.View
     tagName: "div"
     className: "inline"
@@ -172,6 +229,7 @@ class Filter extends Backbone.View
         @id = @options.id
         @setData = @options.setData
 
+    # Helper function to prettify names (eg. hi_world -> Hi World)
     prettyName: (str) ->
         str.charAt(0).toUpperCase() + str.substring(1).replace(/_(\w)/g, (match, p1) -> " " + p1.toUpperCase())
 
