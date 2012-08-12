@@ -36,6 +36,9 @@ Optionally it supports pagination, search, and any number of filters
                 init: new Date()
                 get: (val) ->
                     ... process the date val ...
+            my_btn:
+                type: "button"
+
 ###
 class Backbone.TableView extends Backbone.View
     tagName: "div"
