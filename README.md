@@ -43,6 +43,9 @@ of filters (see supported filters below):
                     ... process the date val ...
             my_button:
                 type: "button"
+            status:
+                type: "option"
+                options: ["all", "valid", "invalid"]
 
 Use it as any other Backbone View, either setting the "el" property at
 creation, or letting backbone create if for you, eg (Users is a regular
@@ -58,9 +61,7 @@ or
 
 ### Filters
 
-Supported filters are "input" and "button". Any filter can have a "init"
-property for the initial value, "className" to add classes, and "get" to process the
-input of the filter for use in the GET request.
+Supported filters are "input", "button" and "options".
 
 ## License
 

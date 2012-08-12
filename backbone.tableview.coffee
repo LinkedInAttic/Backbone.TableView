@@ -38,6 +38,9 @@ Optionally it supports pagination, search, and any number of filters
                     ... process the date val ...
             my_btn:
                 type: "button"
+            status:
+                type: "option"
+                options: ["all", "valid", "invalid"]
 
 ###
 class Backbone.TableView extends Backbone.View
@@ -130,6 +133,12 @@ class Backbone.TableView extends Backbone.View
     # Creates a filter from a filter config definition
     createFilter: (name, filter) =>
         switch filter.type
+            when "option"
+                return new ButtonOptionFilter
+                    id: name
+                    filterClass: filter.className or ""
+                    options: filter.options
+                    setData: @setData
             when "button"
                 return new ButtonFilter
                     id: name
@@ -275,3 +284,22 @@ class ButtonFilter extends Filter
     update: =>
         @current = 1 - @current
         @setData @id, @values[@current]
+
+class ButtonOptionFilter extends Filter
+    template: _.template """
+        <div class="btn-group <%= filterClass %>" data-toggle="buttons-radio">
+            <% _.each(options, function (el, i) { %>
+                <button class="btn <%= (i == 0 && "active") || "" %>" value="<%= el.value %>"><%= el.name %></button>
+            <% }) %>
+        </div>
+    """
+    events:
+        "click .btn": "update"
+
+    initialize: ->
+        super
+        @options.options = _.map @options.options,
+            (option) => {name: @prettyName(option.name || option), value: option.value or option}
+
+    update: (e) =>
+        @setData @id, e.currentTarget.value
