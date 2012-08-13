@@ -41,7 +41,7 @@ Optionally it supports pagination, search, and any number of filters
                 type: "button"
 */
 
-var ButtonFilter, Filter, InputFilter,
+var ButtonFilter, ButtonOptionFilter, Filter, InputFilter,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -91,10 +91,16 @@ Backbone.TableView = (function(_super) {
   };
 
   TableView.prototype.initialize = function() {
+    var key, val, _ref;
     this.collection.on("reset", this.renderData);
-    this.data = this.options.initialData || this.initialData || {};
-    this.data.page = this.options.page || this.page || 1;
-    this.data.size = this.options.size || this.size || 10;
+    _ref = this.options;
+    for (key in _ref) {
+      val = _ref[key];
+      this[key] = val || this[key];
+    }
+    this.data = this.initialData || {};
+    this.data.page = this.page || 1;
+    this.data.size = this.size || 10;
     return this;
   };
 
@@ -105,6 +111,14 @@ Backbone.TableView = (function(_super) {
 
   TableView.prototype.createFilter = function(name, filter) {
     switch (filter.type) {
+      case "option":
+        return new ButtonOptionFilter({
+          id: name,
+          init: filter.init || "false",
+          filterClass: filter.className || "",
+          options: filter.options,
+          setData: this.setData
+        });
       case "button":
         return new ButtonFilter({
           id: name,
@@ -313,5 +327,39 @@ ButtonFilter = (function(_super) {
   };
 
   return ButtonFilter;
+
+})(Filter);
+
+ButtonOptionFilter = (function(_super) {
+
+  __extends(ButtonOptionFilter, _super);
+
+  function ButtonOptionFilter() {
+    this.update = __bind(this.update, this);
+    return ButtonOptionFilter.__super__.constructor.apply(this, arguments);
+  }
+
+  ButtonOptionFilter.prototype.template = _.template("<div class=\"btn-group\" data-toggle=\"buttons-radio\">\n    <% _.each(options, function (el, i) { %>\n        <button class=\"btn <%= (i == 0 && \"active\") || \"\" %>\" value=\"<%= el.value %>\"><%= el.name %></button>\n    <% }) %>\n</div>");
+
+  ButtonOptionFilter.prototype.events = {
+    "click .btn": "update"
+  };
+
+  ButtonOptionFilter.prototype.initialize = function() {
+    var _this = this;
+    ButtonOptionFilter.__super__.initialize.apply(this, arguments);
+    return this.options.options = _.map(this.options.options, function(option) {
+      return {
+        name: _this.prettyName(option.name || option),
+        value: option.value || option
+      };
+    });
+  };
+
+  ButtonOptionFilter.prototype.update = function(e) {
+    return this.setData(this.id, e.currentTarget.value);
+  };
+
+  return ButtonOptionFilter;
 
 })(Filter);
