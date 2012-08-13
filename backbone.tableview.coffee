@@ -124,8 +124,8 @@ class Backbone.TableView extends Backbone.View
         for key, val of @options
             if not this[key]? then this[key] = val
         @data = $.extend({}, @initialData, @parseQueryString Backbone.history.fragment)
-        @data.page = parseInt(@data.page) or 1
-        @data.size = parseInt(@data.size) or 10
+        @data.page = parseInt(@data.page) or @page or 1
+        @data.size = parseInt(@data.size) or @size or 10
         return @
 
     # Navigate to url with all the parameters in data in the querystring
