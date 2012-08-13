@@ -121,24 +121,36 @@ class Backbone.TableView extends Backbone.View
         for key, val of @options
             if key != "el" and key != "collection"
                 this[key] = val or this[key]
-        @data = @initialData or {}
+        @data = $.extend({}, @initialData, @parseQuery Backbone.history.fragment)
         @data.page = @page or 1
         @data.size = @size or 10
         return @
 
-    # Teturn updated uri's querystring with key and value
+    # Navigate to url with new parameters in querystring
+    updateUrl: (key, val) =>
+        @router.navigate(@updateQueryString Backbone.history.fragment, key, val)
+
+    # Return updated uri's querystring with key and value
     updateQueryString: (uri, key, val) ->
         re = new RegExp("([?|&])" + key + "=.*?(&|$)", "i")
         if uri.match(re)
             # TODO delete parameter if value is empty (taking care of the &/? thing)
-            return uri.replace(re, '$1' + key + "=" + val + '$2')
+            return uri.replace(re, "$1" + key + "=" + val + "$2")
         else
-            separator = if uri.indexOf('?') != -1 then "&" else "?"
+            separator = if uri.indexOf("?") != -1 then "&" else "?"
             return uri + separator + key + "=" + val
 
-    # Navigate to url with new parameters in querystring
-    updateUrl: (key, val) =>
-        @router.navigate(@updateQueryString Backbone.history.fragment, key, val)
+    # Return a parsed querystring with the "?" (eg. query = "/users?hi=1&bye=hello")
+    # returns {hi: "1", bye: "hello"}
+    parseQuery: (uri) ->
+        ret = {}
+        if (i = uri.indexOf("?")) >= 0
+            uri    = uri.substring(i + 1)
+            search = /([^&=]+)=?([^&]*)/g
+            decode = (s) -> decodeURIComponent(s.replace(/\+/g, " "))
+            while match = search.exec(uri)
+               ret[decode(match[1])] = decode(match[2])
+        return ret
 
     # Set data and update collection
     setData: (id, val) =>
@@ -158,24 +170,27 @@ class Backbone.TableView extends Backbone.View
                     id: name
                     filterClass: filter.className or ""
                     options: filter.options
+                    init: (filter.set or _.identity) @data[name] or filter.init or filter.options[0].value or filter.options[0]
                     setData: @setData
             when "button"
                 return new ButtonFilter
                     id: name
-                    init: filter.init or "false"
-                    toggle: filter.toggle or "true"
+                    off: filter.off or "false"
+                    on: filter.on or "true"
                     filterClass: filter.className or ""
+                    init: (filter.set or _.identity) @data[name] or filter.init or filter.off or "false"
                     setData: @setData
             when "input"
                 return new InputFilter
                     id: name
-                    init: filter.init or ""
                     className: "input-prepend inline"
                     filterClass: filter.className or ""
                     get: filter.get or _.identity
+                    init: (filter.set or _.identity) @data[name] or filter.init or ""
                     setData: @setData
         # For custom filters, we just provide the setData function
         filter.setData = @setData
+        filter.init = (filter.set or _.identity) @data[name] or filter.init or ""
         return filter
 
     # Update collection only if event was trigger by an enter
@@ -284,15 +299,15 @@ class InputFilter extends Filter
 
 class ButtonFilter extends Filter
     template: _.template """
-        <button type="button" class="filter btn <%= filterClass %>" data-toggle="button"><%= name %></button>
+        <button type="button" class="filter btn <%= init == on ? "active" : "" %> <%= filterClass %>" data-toggle="button"><%= name %></button>
     """
     events:
         "click .filter": "update"
 
     initialize: ->
         super
-        @values = [@options.init, @options.toggle]
-        @current = 0
+        @values = [@options.off, @options.on]
+        @current = if @options.init == @options.off then 0 else 1
 
     update: =>
         @current = 1 - @current
@@ -302,7 +317,7 @@ class ButtonOptionFilter extends Filter
     template: _.template """
         <div class="btn-group <%= filterClass %>" data-toggle="buttons-radio">
             <% _.each(options, function (el, i) { %>
-                <button class="btn <%= (i == 0 && "active") || "" %>" value="<%= el.value %>"><%= el.name %></button>
+                <button class="btn <%= init == el.value ? "active" : "" %>" value="<%= el.value %>"><%= el.name %></button>
             <% }) %>
         </div>
     """
