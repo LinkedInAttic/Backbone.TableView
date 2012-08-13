@@ -39,6 +39,9 @@ Optionally it supports pagination, search, and any number of filters
                     ... process the date val ...
             my_btn:
                 type: "button"
+            status:
+                type: "option"
+                options: ["all", "valid", "invalid"]
 */
 
 var ButtonFilter, ButtonOptionFilter, Filter, InputFilter,
@@ -68,6 +71,8 @@ Backbone.TableView = (function(_super) {
     this.createFilter = __bind(this.createFilter, this);
 
     this.setData = __bind(this.setData, this);
+
+    this.updateUrl = __bind(this.updateUrl, this);
     return TableView.__super__.constructor.apply(this, arguments);
   }
 
@@ -96,16 +101,56 @@ Backbone.TableView = (function(_super) {
     _ref = this.options;
     for (key in _ref) {
       val = _ref[key];
-      this[key] = val || this[key];
+      if (key !== "el" && key !== "collection") {
+        this[key] = val || this[key];
+      }
     }
-    this.data = this.initialData || {};
+    this.data = $.extend({}, this.initialData, this.parseQuery(Backbone.history.fragment));
     this.data.page = this.page || 1;
     this.data.size = this.size || 10;
     return this;
   };
 
+  TableView.prototype.updateUrl = function(key, val) {
+    return this.router.navigate(this.updateQueryString(Backbone.history.fragment, key, val));
+  };
+
+  TableView.prototype.updateQueryString = function(uri, key, val) {
+    var re, separator;
+    re = new RegExp("([?|&])" + key + "=.*?(&|$)", "i");
+    if (uri.match(re)) {
+      return uri.replace(re, "$1" + key + "=" + val + "$2");
+    } else {
+      separator = uri.indexOf("?") !== -1 ? "&" : "?";
+      return uri + separator + key + "=" + val;
+    }
+  };
+
+  TableView.prototype.parseQuery = function(uri) {
+    var decode, i, match, ret, search;
+    ret = {};
+    if ((i = uri.indexOf("?")) >= 0) {
+      uri = uri.substring(i + 1);
+      search = /([^&=]+)=?([^&]*)/g;
+      decode = function(s) {
+        return decodeURIComponent(s.replace(/\+/g, " "));
+      };
+      while (match = search.exec(uri)) {
+        ret[decode(match[1])] = decode(match[2]);
+      }
+    }
+    return ret;
+  };
+
   TableView.prototype.setData = function(id, val) {
-    this.data[id] = val;
+    if (val) {
+      this.data[id] = val;
+    } else {
+      delete this.data[id];
+    }
+    if (this.router) {
+      this.updateUrl(id, val);
+    }
     return this.update();
   };
 
@@ -114,43 +159,38 @@ Backbone.TableView = (function(_super) {
       case "option":
         return new ButtonOptionFilter({
           id: name,
-          init: filter.init || "false",
           filterClass: filter.className || "",
           options: filter.options,
+          init: (filter.set || _.identity)(this.data[name] || filter.init || filter.options[0].value || filter.options[0]),
           setData: this.setData
         });
       case "button":
         return new ButtonFilter({
           id: name,
-          init: filter.init || "false",
-          toggle: filter.toggle || "true",
+          off: filter.off || "false",
+          on: filter.on || "true",
           filterClass: filter.className || "",
+          init: (filter.set || _.identity)(this.data[name] || filter.init || filter.off || "false"),
           setData: this.setData
         });
       case "input":
         return new InputFilter({
           id: name,
-          init: filter.init || "",
           className: "input-prepend inline",
           filterClass: filter.className || "",
           get: filter.get || _.identity,
+          init: (filter.set || _.identity)(this.data[name] || filter.init || ""),
           setData: this.setData
         });
     }
     filter.setData = this.setData;
+    filter.init = (filter.set || _.identity)(this.data[name] || filter.init || "");
     return filter;
   };
 
   TableView.prototype.updateSearchOnEnter = function(e) {
-    var val;
     if (e.keyCode === 13) {
-      val = e.currentTarget.value;
-      if (val) {
-        this.data[this.search.query || "q"] = val;
-      } else {
-        delete this.data[this.search.query || "q"];
-      }
-      this.update();
+      this.setData(this.search.query || "q", e.currentTarget.value);
     }
     return this;
   };
@@ -200,7 +240,7 @@ Backbone.TableView = (function(_super) {
     } else {
       return this;
     }
-    $("th.sorting_desc, th.sorting_asc", this.$el).removeClass("sorting_desc sorting_asc");
+    $("th", this.$el).removeClass("sorting_desc sorting_asc");
     $(el, this.$el).addClass(cl);
     this.data.sort_col = el.abbr;
     return this.update();
@@ -227,8 +267,7 @@ Backbone.TableView = (function(_super) {
     });
     filtersDiv = $(".filters", this.$el);
     _.each(this.filters, function(filter) {
-      filtersDiv.append(filter.render().el);
-      return filtersDiv.append(" ");
+      return filtersDiv.append(filter.render().el, " ");
     });
     return this.update();
   };
@@ -309,7 +348,7 @@ ButtonFilter = (function(_super) {
     return ButtonFilter.__super__.constructor.apply(this, arguments);
   }
 
-  ButtonFilter.prototype.template = _.template("<button type=\"button\" class=\"filter btn <%= filterClass %>\" data-toggle=\"button\"><%= name %></button>");
+  ButtonFilter.prototype.template = _.template("<button type=\"button\" class=\"filter btn <%= init == on ? \"active\" : \"\" %> <%= filterClass %>\" data-toggle=\"button\"><%= name %></button>");
 
   ButtonFilter.prototype.events = {
     "click .filter": "update"
@@ -317,8 +356,8 @@ ButtonFilter = (function(_super) {
 
   ButtonFilter.prototype.initialize = function() {
     ButtonFilter.__super__.initialize.apply(this, arguments);
-    this.values = [this.options.init, this.options.toggle];
-    return this.current = 0;
+    this.values = [this.options.off, this.options.on];
+    return this.current = this.options.init === this.options.off ? 0 : 1;
   };
 
   ButtonFilter.prototype.update = function() {
@@ -339,7 +378,7 @@ ButtonOptionFilter = (function(_super) {
     return ButtonOptionFilter.__super__.constructor.apply(this, arguments);
   }
 
-  ButtonOptionFilter.prototype.template = _.template("<div class=\"btn-group\" data-toggle=\"buttons-radio\">\n    <% _.each(options, function (el, i) { %>\n        <button class=\"btn <%= (i == 0 && \"active\") || \"\" %>\" value=\"<%= el.value %>\"><%= el.name %></button>\n    <% }) %>\n</div>");
+  ButtonOptionFilter.prototype.template = _.template("<div class=\"btn-group <%= filterClass %>\" data-toggle=\"buttons-radio\">\n    <% _.each(options, function (el, i) { %>\n        <button class=\"btn <%= init == el.value ? \"active\" : \"\" %>\" value=\"<%= el.value %>\"><%= el.name %></button>\n    <% }) %>\n</div>");
 
   ButtonOptionFilter.prototype.events = {
     "click .btn": "update"
