@@ -211,7 +211,7 @@ class Backbone.TableView extends Backbone.View
             cl = "sorting_desc"
         else
             return @
-        $("th.sorting_desc, th.sorting_asc", @$el).removeClass("sorting_desc sorting_asc")
+        $("th", @$el).removeClass("sorting_desc sorting_asc")
         $(el, @$el).addClass(cl)
         @data.sort_col = el.abbr
         @update()
