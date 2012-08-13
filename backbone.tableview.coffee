@@ -41,20 +41,19 @@ Optionally it supports pagination, search, and any number of filters
             status:
                 type: "option"
                 options: ["all", "valid", "invalid"]
-
 ###
 class Backbone.TableView extends Backbone.View
     tagName: "div"
     titleTemplate: _.template "<h2><%= model %></h2>"
     searchTemplate: _.template """
-        <input type="text" class="search-query pull-right" placeholder="<%= model.detail || model %>"></input>
+        <input type="text" class="search-query pull-right" placeholder="<%= model.detail || model %>" value="<%= data[model.query || "q"] || "" %>"></input>
     """
     paginationTemplate: _.template """
         <ul class="pager">
             <li class="pager-prev">
                 <a href="javascript:void(0)">&larr; Prev</a>
             </li>
-            <span class="badge badge-info page">1</span>
+            <span class="badge badge-info page"><%= data.page %></span>
             <li class="pager-next">
                 <a href="javascript:void(0)">Next &rarr;</a>
             </li>
@@ -121,28 +120,29 @@ class Backbone.TableView extends Backbone.View
         for key, val of @options
             if key != "el" and key != "collection"
                 this[key] = val or this[key]
-        @data = $.extend({}, @initialData, @parseQuery Backbone.history.fragment)
-        @data.page = @page or 1
-        @data.size = @size or 10
+        @data = $.extend({}, @initialData, @parseQueryString Backbone.history.fragment)
+        @data.page = parseInt(@data.page) or 1
+        @data.size = parseInt(@data.size) or 10
         return @
 
-    # Navigate to url with new parameters in querystring
-    updateUrl: (key, val) =>
-        @router.navigate(@updateQueryString Backbone.history.fragment, key, val)
-
-    # Return updated uri's querystring with key and value
-    updateQueryString: (uri, key, val) ->
-        re = new RegExp("([?|&])" + key + "=.*?(&|$)", "i")
-        if uri.match(re)
-            # TODO delete parameter if value is empty (taking care of the &/? thing)
-            return uri.replace(re, "$1" + key + "=" + val + "$2")
-        else
-            separator = if uri.indexOf("?") != -1 then "&" else "?"
-            return uri + separator + key + "=" + val
+    # Navigate to url with all the parameters in data in the querystring
+    updateUrl: =>
+        uri = Backbone.history.fragment
+        if (i = uri.indexOf("?")) > 0
+            uri = uri.substring(0, i)
+        first = true
+        for key, val of @data
+            if first
+                first = false
+                separator = "?"
+            else
+                separator = "&"
+            uri = uri + separator + key + "=" + val
+        @router.navigate(uri)
 
     # Return a parsed querystring with the "?" (eg. query = "/users?hi=1&bye=hello")
     # returns {hi: "1", bye: "hello"}
-    parseQuery: (uri) ->
+    parseQueryString: (uri) ->
         ret = {}
         if (i = uri.indexOf("?")) >= 0
             uri    = uri.substring(i + 1)
@@ -153,13 +153,17 @@ class Backbone.TableView extends Backbone.View
         return ret
 
     # Set data and update collection
-    setData: (id, val) =>
+    setData: (key, val, key2, val2) =>
         if val
-            @data[id] = val
-        else
-            delete @data[id]
+            @data[key] = val
+        else if key
+            delete @data[key]
+        if val2
+            @data[key2] = val2
+        else if key2
+            delete @data[key2]
         if @router
-            @updateUrl id, val
+            @updateUrl()
         @update()
 
     # Creates a filter from a filter config definition
@@ -215,40 +219,38 @@ class Backbone.TableView extends Backbone.View
     # Go to the previous page in the collection
     prevPage: =>
         if @data.page > 1
-            @data.page = @data.page - 1
-            $(".page", @$el).html @data.page
-            @update()
+            $(".page", @$el).html @data.page - 1
+            @setData "page", @data.page - 1
 
     # Go to the next page in the collection
     nextPage: =>
         # Since we don't have a collection count, for now we use the size of
         # the last GET as an heuristic to limit the use of nextPage
         if @collection.length == @data.size
-            @data.page = @data.page + 1
-            $(".page", @$el).html @data.page
-            @update()
+            $(".page", @$el).html @data.page + 1
+            @setData "page", @data.page + 1
 
     # Toggle/Select sort column and direction, and update table accodingly
     toggleSort: (e) =>
         el = e.currentTarget
         cl = el.className
+        sort_dir = ""
         if cl.indexOf("sorting_desc") >= 0
-            @data.sort_dir = "asc"
+            sort_dir = "asc"
             cl = "sorting_asc"
         else if cl.indexOf("sorting") >= 0 or cl.indexOf("sorting_asc") >= 0
-            @data.sort_dir = "desc"
+            sort_dir = "desc"
             cl = "sorting_desc"
         else
             return @
-        $("th", @$el).removeClass("sorting_desc sorting_asc")
-        $(el, @$el).addClass(cl)
-        @data.sort_col = el.abbr
-        @update()
+        $("th", @$el).removeClass "sorting_desc sorting_asc"
+        $(el, @$el).addClass cl
+        @setData "sort_col", el.abbr, "sort_dir", sort_dir
 
     # Apply a template to a model and return the result (string), or empty
     # string if model is false/undefined
     applyTemplate: (template, model) ->
-        (model and template model: model) or ""
+        (model and template data: @data, model: model) or ""
 
     # Render skeleton of the table, creating filters and other additions,
     # and trigger an update of the collection
