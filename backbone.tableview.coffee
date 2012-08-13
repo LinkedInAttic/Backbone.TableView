@@ -128,7 +128,7 @@ class Backbone.TableView extends Backbone.View
     # Navigate to url with all the parameters in data in the querystring
     updateUrl: =>
         uri = Backbone.history.fragment
-        if (i = uri.indexOf("?")) > 0
+        if (i = uri.indexOf "?") > 0
             uri = uri.substring(0, i)
         first = true
         for key, val of @data
@@ -138,7 +138,7 @@ class Backbone.TableView extends Backbone.View
             else
                 separator = "&"
             uri = uri + separator + key + "=" + val
-        @router.navigate(uri)
+        @router.navigate uri
 
     # Return a parsed querystring with the "?" (eg. query = "/users?hi=1&bye=hello")
     # returns {hi: "1", bye: "hello"}
