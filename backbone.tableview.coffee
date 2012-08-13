@@ -119,7 +119,8 @@ class Backbone.TableView extends Backbone.View
     initialize: ->
         @collection.on "reset", @renderData
         for key, val of @options
-            this[key] = val or this[key]
+            if key != "el" and key != "collection"
+                this[key] = val or this[key]
         @data = @initialData or {}
         @data.page = @page or 1
         @data.size = @size or 10
