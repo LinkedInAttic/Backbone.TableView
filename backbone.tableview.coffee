@@ -233,9 +233,7 @@ class Backbone.TableView extends Backbone.View
 
         @filters = _.map(@filters, (filter, name) => @createFilter(name, filter))
         filtersDiv = $(".filters", @$el)
-        _.each @filters, (filter) ->
-            filtersDiv.append filter.render().el
-            filtersDiv.append " "
+        _.each @filters, (filter) -> filtersDiv.append filter.render().el, " "
         @update()
 
 ###
