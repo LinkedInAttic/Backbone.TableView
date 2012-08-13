@@ -75,6 +75,14 @@ class Backbone.TableView extends Backbone.View
             </tr>
         <% } %>
     """
+    columnsTemplate: _.template """
+        <% _.each(model, function (col, key) { %>
+            <th abbr="<%= key || col %>"
+             class="<%= !col.nosort && "sorting" %> <%= ((key || col) == data.sort_col) && "sorting_" + data.sort_dir %> <%= col.className || "" %>">
+                <%= col.header || col %>
+            </th>
+        <% }) %>
+    """
     template: _.template """
         <div class="row-fluid">
             <div class="span2">
@@ -92,11 +100,7 @@ class Backbone.TableView extends Backbone.View
         <table class="table table-striped table-bordered">
             <thead>
                 <tr>
-                    <% _.each(columns, function (col, key) { %>
-                        <th abbr="<%= key || col %>" class="<%= !col.nosort && "sorting" %> <%= col.className || "" %>">
-                            <%= col.header || col %>
-                        </th>
-                    <% }) %>
+                    <%= columns %>
                 </tr>
             </thead>
             <tbody>
@@ -256,10 +260,10 @@ class Backbone.TableView extends Backbone.View
     # and trigger an update of the collection
     render: =>
         @$el.html @template
-            columns:    @columns
             empty:      @empty or ""
             title:      @applyTemplate @titleTemplate,      @title
             search:     @applyTemplate @searchTemplate,     @search
+            columns:    @applyTemplate @columnsTemplate,    @columns
             pagination: @applyTemplate @paginationTemplate, @pagination
 
         @filters = _.map(@filters, (filter, name) => @createFilter(name, filter))
