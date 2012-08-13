@@ -126,20 +126,19 @@ class Backbone.TableView extends Backbone.View
         @data.size = @size or 10
         return @
 
+    # Teturn updated uri's querystring with key and value
     updateQueryString: (uri, key, val) ->
-        separator = if uri.indexOf('?') != -1 then "&" else "?"
         re = new RegExp("([?|&])" + key + "=.*?(&|$)", "i")
         if uri.match(re)
-            if val
-                return uri.replace(re, '$1' + key + "=" + val + '$2')
-            else
-                return uri.replace(re, '$2')
+            # TODO delete parameter if value is empty (taking care of the &/? thing)
+            return uri.replace(re, '$1' + key + "=" + val + '$2')
         else
+            separator = if uri.indexOf('?') != -1 then "&" else "?"
             return uri + separator + key + "=" + val
 
-    # Update url with new parameters in querystring
-    updateUrl: (id, val) =>
-        @router.navigate(@updateQueryString Backbone.history.fragment, id, val)
+    # Navigate to url with new parameters in querystring
+    updateUrl: (key, val) =>
+        @router.navigate(@updateQueryString Backbone.history.fragment, key, val)
 
     # Set data and update collection
     setData: (id, val) =>
