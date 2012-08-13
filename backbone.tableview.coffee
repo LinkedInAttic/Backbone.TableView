@@ -126,9 +126,29 @@ class Backbone.TableView extends Backbone.View
         @data.size = @size or 10
         return @
 
+    updateQueryString: (uri, key, val) ->
+        separator = if uri.indexOf('?') != -1 then "&" else "?"
+        re = new RegExp("([?|&])" + key + "=.*?(&|$)", "i")
+        if uri.match(re)
+            if val
+                return uri.replace(re, '$1' + key + "=" + val + '$2')
+            else
+                return uri.replace(re, '$2')
+        else
+            return uri + separator + key + "=" + val
+
+    # Update url with new parameters in querystring
+    updateUrl: (id, val) =>
+        @router.navigate(@updateQueryString Backbone.history.fragment, id, val)
+
     # Set data and update collection
     setData: (id, val) =>
-        @data[id] = val
+        if val
+            @data[id] = val
+        else
+            delete @data[id]
+        if @router
+            @updateUrl id, val
         @update()
 
     # Creates a filter from a filter config definition
@@ -162,12 +182,7 @@ class Backbone.TableView extends Backbone.View
     # Update collection only if event was trigger by an enter
     updateSearchOnEnter: (e) =>
         if e.keyCode == 13
-            val = e.currentTarget.value
-            if val
-                @data[@search.query or "q"] = val
-            else
-                delete @data[@search.query or "q"]
-            @update()
+            @setData @search.query or "q", e.currentTarget.value
         return @
 
     # Update the collection given all the options/filters
