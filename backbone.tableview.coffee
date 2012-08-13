@@ -122,8 +122,7 @@ class Backbone.TableView extends Backbone.View
     initialize: ->
         @collection.on "reset", @renderData
         for key, val of @options
-            if key != "el" and key != "collection"
-                this[key] = val or this[key]
+            if not this[key]? then this[key] = val
         @data = $.extend({}, @initialData, @parseQueryString Backbone.history.fragment)
         @data.page = parseInt(@data.page) or 1
         @data.size = parseInt(@data.size) or 10
