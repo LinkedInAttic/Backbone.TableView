@@ -86,7 +86,7 @@ class Backbone.TableView extends Backbone.View
         <% _.each(model, function (col, key) { %>
             <th abbr="<%= key || col %>"
              class="<%= !col.nosort && "sorting" %> <%= ((key || col) == data.sort_col) && "sorting_" + data.sort_dir %> <%= col.className || "" %>">
-                <%= col.header || col %>
+                <%= col.header || key %>
             </th>
         <% }) %>
     """
@@ -289,9 +289,9 @@ class Backbone.TableView extends Backbone.View
     render: =>
         @$el.html @template
             empty:      @empty or ""
-            title:      @applyTemplate @titleTemplate,      @title
-            search:     @applyTemplate @searchTemplate,     @search
-            columns:    @applyTemplate @columnsTemplate,    @columns
+            title:      @applyTemplate @titleTemplate,   @title
+            search:     @applyTemplate @searchTemplate,  @search
+            columns:    @applyTemplate @columnsTemplate, @columns
 
         @filters = _.map(@filters, (filter, name) => @createFilter(name, filter))
         filtersDiv = $(".filters", @$el)
