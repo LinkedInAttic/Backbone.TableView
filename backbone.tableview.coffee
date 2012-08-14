@@ -230,9 +230,9 @@ class Backbone.TableView extends Backbone.View
             pageTo   = @data.page
             max = ""
         else
-            maxPage  = Math.ceil max / @data.size
-            pageFrom = @data.page
-            pageTo   = @data.page
+            maxPage  = Math.ceil(max / @data.size) || 1
+            pageFrom = _.max 1, @data.page - 2
+            pageTo   = _.min maxPage, @data.page + 2
             max = " of " + max + " entries"
         pages = ({number: i, active: (i == @data.page && "active") || ""} for i in _.range pageFrom, pageTo + 1)
         $("#pagination-main", @$el).html @paginationTemplate
