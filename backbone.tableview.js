@@ -153,6 +153,9 @@ Backbone.TableView = (function(_super) {
   };
 
   TableView.prototype.setData = function(key, val, key2, val2) {
+    if (key !== "page" && key2 !== "page") {
+      this.data.page = 1;
+    }
     if (val) {
       this.data[key] = val;
     } else if (key) {
@@ -218,7 +221,7 @@ Backbone.TableView = (function(_super) {
   };
 
   TableView.prototype.refreshPagination = function() {
-    var from, i, max, maxPage, pageFrom, pageTo, pages, to;
+    var from, i, max, maxPage, pageFrom, pageTo, pages, to, total;
     from = (this.data.page - 1) * this.data.size;
     to = from + this.collection.size();
     if (this.collection.size() > 0) {
@@ -229,12 +232,12 @@ Backbone.TableView = (function(_super) {
       maxPage = 1;
       pageFrom = this.data.page;
       pageTo = this.data.page;
-      max = "";
+      total = "";
     } else {
       maxPage = Math.ceil(max / this.data.size) || 1;
-      pageFrom = _.max(1, this.data.page - 2);
-      pageTo = _.min(maxPage, this.data.page + 2);
-      max = " of " + max + " entries";
+      pageFrom = _.max([1, this.data.page - 2]);
+      pageTo = _.min([maxPage, this.data.page + 2]);
+      total = " of " + max + " entries";
     }
     pages = (function() {
       var _i, _len, _ref, _results;
@@ -252,9 +255,9 @@ Backbone.TableView = (function(_super) {
     $("#pagination-main", this.$el).html(this.paginationTemplate({
       from: from,
       to: to,
-      total: max,
+      total: total,
       prevDisabled: this.data.page === 1 ? "disabled" : "",
-      nextDisabled: to === this.collection.size ? "disabled" : "",
+      nextDisabled: to === max ? "disabled" : "",
       pages: pages
     }));
     return this;
