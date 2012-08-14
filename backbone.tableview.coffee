@@ -221,9 +221,10 @@ class Backbone.TableView extends Backbone.View
 
     # Refresh the pagination div at the bottom
     refreshPagination: =>
-        from = (@data.page - 1) * @data.size + 1
-        to   = from + @collection.size() - 1
-        max  = @collection.count or -1
+        from = (@data.page - 1) * @data.size
+        to   = from + @collection.size()
+        if @collection.size() > 0 then from++
+        max  = if @collection.count? then @collection.count() else -1
         if max < 0
             maxPage  = 1
             pageFrom = @data.page
