@@ -49,15 +49,22 @@ class Backbone.TableView extends Backbone.View
         <input type="text" class="search-query pull-right" placeholder="<%= model.detail || model %>" value="<%= data[model.query || "q"] || "" %>"></input>
     """
     paginationTemplate: _.template """
-        <ul class="pager">
-            <li class="pager-prev">
-                <a href="javascript:void(0)">&larr; Prev</a>
-            </li>
-            <span class="badge badge-info page"><%= data.page %></span>
-            <li class="pager-next">
-                <a href="javascript:void(0)">Next &rarr;</a>
-            </li>
-        </ul>
+        <div class="row">
+            <div class="span6">
+                <div id="info">Showing <%= from %> to <%= to %><%= total %></div>
+            </div>
+            <div class="span6">
+                <div class="pagination">
+                    <ul>
+                        <li class="pager-prev <%= prevDisabled %>"><a href="javascript:void(0)">← Previous</a></li>
+                        <% _.each(pages, function (page) { %>
+                            <li class="<%= page.active %>"><a href="javascript:void(0)"><%= page.number %></a></li>
+                        <% }) %>
+                        <li class="pager-next <%= nextDisabled %>"><a href="javascript:void(0)">Next → </a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
     """
     dataTemplate: _.template """
         <% _.each(collection.models, function (row) { %>
@@ -110,7 +117,8 @@ class Backbone.TableView extends Backbone.View
             </tbody>
         </table>
 
-        <%= pagination %>
+        <div id="pagination-main">
+        </div>
     """
     events:
         "keypress .search-query": "updateSearchOnEnter"
@@ -211,13 +219,38 @@ class Backbone.TableView extends Backbone.View
         @collection.fetch data: @data
         return @
 
+    # Refresh the pagination div at the bottom
+    refreshPagination: =>
+        from = (@data.page - 1) * @data.size + 1
+        to   = from + @collection.size() - 1
+        max  = @collection.count || -1
+        if max < 0
+            maxPage  = 1
+            pageFrom = @data.page
+            pageTo   = @data.page
+            max = ""
+        else
+            maxPage  = Math.ceil max / @data.size
+            pageFrom = @data.page
+            pageTo   = @data.page
+            max = " of " + max + " entries"
+        pages = ({number: i, active: (i == @data.page && "active") || ""} for i in _.range pageFrom, pageTo + 1)
+        $("#pagination-main", @$el).html @paginationTemplate
+            from: from
+            to: to
+            total: max
+            prevDisabled: if @data.page == 1 then "disabled" else ""
+            nextDisabled: if to == @collection.size then "disabled" else ""
+            pages: pages
+        return @
+
     # Render the collection in the tbody section of the table
     renderData: =>
         $("tbody", @$el).html @dataTemplate
             collection: @collection
             columns:    @columns
             empty:      @empty or "No records to show"
-        return @
+        @refreshPagination()
 
     # Go to the previous page in the collection
     prevPage: =>
@@ -263,7 +296,6 @@ class Backbone.TableView extends Backbone.View
             title:      @applyTemplate @titleTemplate,      @title
             search:     @applyTemplate @searchTemplate,     @search
             columns:    @applyTemplate @columnsTemplate,    @columns
-            pagination: @applyTemplate @paginationTemplate, @pagination
 
         @filters = _.map(@filters, (filter, name) => @createFilter(name, filter))
         filtersDiv = $(".filters", @$el)
