@@ -235,8 +235,8 @@ Backbone.TableView = (function(_super) {
       total = "";
     } else {
       maxPage = Math.ceil(max / this.data.size) || 1;
-      pageFrom = _.max([1, this.data.page - 2]);
-      pageTo = _.min([maxPage, this.data.page + 2]);
+      pageFrom = _.max([1, this.data.page - 2 - _.max([0, 2 + this.data.page - maxPage])]);
+      pageTo = _.min([maxPage, this.data.page + 2 + _.max([0, 3 - this.data.page])]);
       total = " of " + max + " entries";
     }
     pages = (function() {
