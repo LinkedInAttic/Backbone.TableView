@@ -229,19 +229,19 @@ class Backbone.TableView extends Backbone.View
             maxPage  = 1
             pageFrom = @data.page
             pageTo   = @data.page
-            max = ""
+            total = ""
         else
             maxPage  = Math.ceil(max / @data.size) or 1
-            pageFrom = _.max 1, @data.page - 2
-            pageTo   = _.min maxPage, @data.page + 2
-            max = " of " + max + " entries"
+            pageFrom = _.max [1, @data.page - 2]
+            pageTo   = _.min [maxPage, @data.page + 2]
+            total = " of " + max + " entries"
         pages = ({number: i, active: (i == @data.page and "active") or ""} for i in _.range pageFrom, pageTo + 1)
         $("#pagination-main", @$el).html @paginationTemplate
             from: from
             to: to
-            total: max
+            total: total
             prevDisabled: if @data.page == 1 then "disabled" else ""
-            nextDisabled: if to == @collection.size then "disabled" else ""
+            nextDisabled: if to == max then "disabled" else ""
             pages: pages
         return @
 
