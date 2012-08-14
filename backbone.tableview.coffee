@@ -253,7 +253,8 @@ class Backbone.TableView extends Backbone.View
             collection: @collection
             columns:    @columns
             empty:      @empty or "No records to show"
-        @refreshPagination()
+        if @pagination
+            @refreshPagination()
 
     # Go to the previous page in the collection
     prevPage: =>
