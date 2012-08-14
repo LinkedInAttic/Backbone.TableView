@@ -121,10 +121,10 @@ class Backbone.TableView extends Backbone.View
         </div>
     """
     events:
-        "keypress .search-query":              "updateSearchOnEnter"
-        "click    th":                         "toggleSort"
-        "click    .pager-prev:not(.disabled)": "prevPage"
-        "click    .pager-next:not(.disabled)": "nextPage"
+        "change .search-query":              "updateSearch"
+        "click  th":                         "toggleSort"
+        "click  .pager-prev:not(.disabled)": "prevPage"
+        "click  .pager-next:not(.disabled)": "nextPage"
 
     # Binds the collection update event for rendering
     initialize: ->
@@ -211,10 +211,8 @@ class Backbone.TableView extends Backbone.View
         return filter
 
     # Update collection only if event was trigger by an enter
-    updateSearchOnEnter: (e) =>
-        if e.keyCode == 13
-            @setData @search.query or "q", e.currentTarget.value
-        return @
+    updateSearch: (e) =>
+        @setData @search.query or "q", e.currentTarget.value
 
     # Update the collection given all the options/filters
     update: =>

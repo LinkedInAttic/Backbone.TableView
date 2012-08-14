@@ -68,7 +68,7 @@ Backbone.TableView = (function(_super) {
 
     this.update = __bind(this.update, this);
 
-    this.updateSearchOnEnter = __bind(this.updateSearchOnEnter, this);
+    this.updateSearch = __bind(this.updateSearch, this);
 
     this.createFilter = __bind(this.createFilter, this);
 
@@ -93,10 +93,10 @@ Backbone.TableView = (function(_super) {
   TableView.prototype.template = _.template("<div class=\"row-fluid\">\n    <div class=\"span2\">\n        <%= title %>\n    </div>\n\n    <div class=\"filters controls pagination-centered span8\">\n    </div>\n\n    <div class=\"span2\">\n        <%= search %>\n    </div>\n</div>\n\n<table class=\"table table-striped table-bordered\">\n    <thead>\n        <tr>\n            <%= columns %>\n        </tr>\n    </thead>\n    <tbody>\n        <tr>\n            <td colspan=\"10\"><%= empty %></td>\n        </tr>\n    </tbody>\n</table>\n\n<div id=\"pagination-main\">\n</div>");
 
   TableView.prototype.events = {
-    "keypress .search-query": "updateSearchOnEnter",
-    "click    th": "toggleSort",
-    "click    .pager-prev:not(.disabled)": "prevPage",
-    "click    .pager-next:not(.disabled)": "nextPage"
+    "change .search-query": "updateSearch",
+    "click  th": "toggleSort",
+    "click  .pager-prev:not(.disabled)": "prevPage",
+    "click  .pager-next:not(.disabled)": "nextPage"
   };
 
   TableView.prototype.initialize = function() {
@@ -206,11 +206,8 @@ Backbone.TableView = (function(_super) {
     return filter;
   };
 
-  TableView.prototype.updateSearchOnEnter = function(e) {
-    if (e.keyCode === 13) {
-      this.setData(this.search.query || "q", e.currentTarget.value);
-    }
-    return this;
+  TableView.prototype.updateSearch = function(e) {
+    return this.setData(this.search.query || "q", e.currentTarget.value);
   };
 
   TableView.prototype.update = function() {
