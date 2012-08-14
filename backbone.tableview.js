@@ -64,6 +64,8 @@ Backbone.TableView = (function(_super) {
 
     this.renderData = __bind(this.renderData, this);
 
+    this.refreshPagination = __bind(this.refreshPagination, this);
+
     this.update = __bind(this.update, this);
 
     this.updateSearchOnEnter = __bind(this.updateSearchOnEnter, this);
@@ -82,19 +84,19 @@ Backbone.TableView = (function(_super) {
 
   TableView.prototype.searchTemplate = _.template("<input type=\"text\" class=\"search-query pull-right\" placeholder=\"<%= model.detail || model %>\" value=\"<%= data[model.query || \"q\"] || \"\" %>\"></input>");
 
-  TableView.prototype.paginationTemplate = _.template("<ul class=\"pager\">\n    <li class=\"pager-prev\">\n        <a href=\"javascript:void(0)\">&larr; Prev</a>\n    </li>\n    <span class=\"badge badge-info page\"><%= data.page %></span>\n    <li class=\"pager-next\">\n        <a href=\"javascript:void(0)\">Next &rarr;</a>\n    </li>\n</ul>");
+  TableView.prototype.paginationTemplate = _.template("<div class=\"row\">\n    <div class=\"span6\">\n        <div id=\"info\">Showing <%= from %> to <%= to %><%= total %></div>\n    </div>\n    <div class=\"span6\">\n        <div class=\"pagination\">\n            <ul>\n                <li class=\"pager-prev <%= prevDisabled %>\"><a href=\"javascript:void(0)\">← Previous</a></li>\n                <% _.each(pages, function (page) { %>\n                    <li class=\"<%= page.active %>\"><a href=\"javascript:void(0)\"><%= page.number %></a></li>\n                <% }) %>\n                <li class=\"pager-next <%= nextDisabled %>\"><a href=\"javascript:void(0)\">Next → </a></li>\n            </ul>\n        </div>\n    </div>\n</div>");
 
   TableView.prototype.dataTemplate = _.template("<% _.each(collection.models, function (row) { %>\n    <tr>\n        <% _.each(columns, function (col, name) { %>\n            <td class=\"<%= col.className || \"\" %>\">\n                <%= col.draw ? col.draw(row) : row.get(name) %>\n            </td>\n        <% }) %>\n    </tr>\n<% }) %>\n<% if (collection.models.length == 0) { %>\n    <tr>\n        <td colspan=\"10\"><%= empty %></td>\n    </tr>\n<% } %>");
 
   TableView.prototype.columnsTemplate = _.template("<% _.each(model, function (col, key) { %>\n    <th abbr=\"<%= key || col %>\"\n     class=\"<%= !col.nosort && \"sorting\" %> <%= ((key || col) == data.sort_col) && \"sorting_\" + data.sort_dir %> <%= col.className || \"\" %>\">\n        <%= col.header || col %>\n    </th>\n<% }) %>");
 
-  TableView.prototype.template = _.template("<div class=\"row-fluid\">\n    <div class=\"span2\">\n        <%= title %>\n    </div>\n\n    <div class=\"filters controls pagination-centered span8\">\n    </div>\n\n    <div class=\"span2\">\n        <%= search %>\n    </div>\n</div>\n\n<table class=\"table table-striped table-bordered\">\n    <thead>\n        <tr>\n            <%= columns %>\n        </tr>\n    </thead>\n    <tbody>\n        <tr>\n            <td colspan=\"10\"><%= empty %></td>\n        </tr>\n    </tbody>\n</table>\n\n<%= pagination %>");
+  TableView.prototype.template = _.template("<div class=\"row-fluid\">\n    <div class=\"span2\">\n        <%= title %>\n    </div>\n\n    <div class=\"filters controls pagination-centered span8\">\n    </div>\n\n    <div class=\"span2\">\n        <%= search %>\n    </div>\n</div>\n\n<table class=\"table table-striped table-bordered\">\n    <thead>\n        <tr>\n            <%= columns %>\n        </tr>\n    </thead>\n    <tbody>\n        <tr>\n            <td colspan=\"10\"><%= empty %></td>\n        </tr>\n    </tbody>\n</table>\n\n<div id=\"pagination-main\">\n</div>");
 
   TableView.prototype.events = {
     "keypress .search-query": "updateSearchOnEnter",
-    "click    .pager-prev": "prevPage",
-    "click    .pager-next": "nextPage",
-    "click    th": "toggleSort"
+    "click    th": "toggleSort",
+    "click    .pager-prev:not(.disabled)": "prevPage",
+    "click    .pager-next:not(.disabled)": "nextPage"
   };
 
   TableView.prototype.initialize = function() {
@@ -103,13 +105,13 @@ Backbone.TableView = (function(_super) {
     _ref = this.options;
     for (key in _ref) {
       val = _ref[key];
-      if (key !== "el" && key !== "collection") {
-        this[key] = val || this[key];
+      if (!(this[key] != null)) {
+        this[key] = val;
       }
     }
     this.data = $.extend({}, this.initialData, this.parseQueryString(Backbone.history.fragment));
-    this.data.page = parseInt(this.data.page) || 1;
-    this.data.size = parseInt(this.data.size) || 10;
+    this.data.page = parseInt(this.data.page) || this.page || 1;
+    this.data.size = parseInt(this.data.size) || this.size || 10;
     return this;
   };
 
@@ -215,27 +217,64 @@ Backbone.TableView = (function(_super) {
     return this;
   };
 
+  TableView.prototype.refreshPagination = function() {
+    var from, i, max, maxPage, pageFrom, pageTo, pages, to;
+    from = (this.data.page - 1) * this.data.size;
+    to = from + this.collection.size();
+    if (this.collection.size() > 0) {
+      from++;
+    }
+    max = this.collection.count != null ? this.collection.count() : -1;
+    if (max < 0) {
+      maxPage = 1;
+      pageFrom = this.data.page;
+      pageTo = this.data.page;
+      max = "";
+    } else {
+      maxPage = Math.ceil(max / this.data.size) || 1;
+      pageFrom = _.max(1, this.data.page - 2);
+      pageTo = _.min(maxPage, this.data.page + 2);
+      max = " of " + max + " entries";
+    }
+    pages = (function() {
+      var _i, _len, _ref, _results;
+      _ref = _.range(pageFrom, pageTo + 1);
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        i = _ref[_i];
+        _results.push({
+          number: i,
+          active: (i === this.data.page && "active") || ""
+        });
+      }
+      return _results;
+    }).call(this);
+    $("#pagination-main", this.$el).html(this.paginationTemplate({
+      from: from,
+      to: to,
+      total: max,
+      prevDisabled: this.data.page === 1 ? "disabled" : "",
+      nextDisabled: to === this.collection.size ? "disabled" : "",
+      pages: pages
+    }));
+    return this;
+  };
+
   TableView.prototype.renderData = function() {
     $("tbody", this.$el).html(this.dataTemplate({
       collection: this.collection,
       columns: this.columns,
       empty: this.empty || "No records to show"
     }));
-    return this;
+    return this.refreshPagination();
   };
 
   TableView.prototype.prevPage = function() {
-    if (this.data.page > 1) {
-      $(".page", this.$el).html(this.data.page - 1);
-      return this.setData("page", this.data.page - 1);
-    }
+    return this.setData("page", this.data.page - 1);
   };
 
   TableView.prototype.nextPage = function() {
-    if (this.collection.length === this.data.size) {
-      $(".page", this.$el).html(this.data.page + 1);
-      return this.setData("page", this.data.page + 1);
-    }
+    return this.setData("page", this.data.page + 1);
   };
 
   TableView.prototype.toggleSort = function(e) {
@@ -271,8 +310,7 @@ Backbone.TableView = (function(_super) {
       empty: this.empty || "",
       title: this.applyTemplate(this.titleTemplate, this.title),
       search: this.applyTemplate(this.searchTemplate, this.search),
-      columns: this.applyTemplate(this.columnsTemplate, this.columns),
-      pagination: this.applyTemplate(this.paginationTemplate, this.pagination)
+      columns: this.applyTemplate(this.columnsTemplate, this.columns)
     }));
     this.filters = _.map(this.filters, function(filter, name) {
       return _this.createFilter(name, filter);
