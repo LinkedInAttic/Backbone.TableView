@@ -223,18 +223,18 @@ class Backbone.TableView extends Backbone.View
     refreshPagination: =>
         from = (@data.page - 1) * @data.size + 1
         to   = from + @collection.size() - 1
-        max  = @collection.count || -1
+        max  = @collection.count or -1
         if max < 0
             maxPage  = 1
             pageFrom = @data.page
             pageTo   = @data.page
             max = ""
         else
-            maxPage  = Math.ceil(max / @data.size) || 1
+            maxPage  = Math.ceil(max / @data.size) or 1
             pageFrom = _.max 1, @data.page - 2
             pageTo   = _.min maxPage, @data.page + 2
             max = " of " + max + " entries"
-        pages = ({number: i, active: (i == @data.page && "active") || ""} for i in _.range pageFrom, pageTo + 1)
+        pages = ({number: i, active: (i == @data.page and "active") or ""} for i in _.range pageFrom, pageTo + 1)
         $("#pagination-main", @$el).html @paginationTemplate
             from: from
             to: to
@@ -364,7 +364,7 @@ class ButtonOptionFilter extends Filter
     initialize: ->
         super
         @options.options = _.map @options.options,
-            (option) => {name: @prettyName(option.name || option), value: option.value or option}
+            (option) => {name: @prettyName(option.name or option), value: option.value or option}
 
     update: (e) =>
         @setData @id, e.currentTarget.value
