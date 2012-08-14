@@ -121,10 +121,10 @@ class Backbone.TableView extends Backbone.View
         </div>
     """
     events:
-        "keypress .search-query": "updateSearchOnEnter"
-        "click    .pager-prev":   "prevPage"
-        "click    .pager-next":   "nextPage"
-        "click    th":            "toggleSort"
+        "keypress .search-query":              "updateSearchOnEnter"
+        "click    th":                         "toggleSort"
+        "click    .pager-prev:not(.disabled)": "prevPage"
+        "click    .pager-next:not(.disabled)": "nextPage"
 
     # Binds the collection update event for rendering
     initialize: ->
@@ -254,17 +254,11 @@ class Backbone.TableView extends Backbone.View
 
     # Go to the previous page in the collection
     prevPage: =>
-        if @data.page > 1
-            $(".page", @$el).html @data.page - 1
-            @setData "page", @data.page - 1
+        @setData "page", @data.page - 1
 
     # Go to the next page in the collection
     nextPage: =>
-        # Since we don't have a collection count, for now we use the size of
-        # the last GET as an heuristic to limit the use of nextPage
-        if @collection.length == @data.size
-            $(".page", @$el).html @data.page + 1
-            @setData "page", @data.page + 1
+        @setData "page", @data.page + 1
 
     # Toggle/Select sort column and direction, and update table accodingly
     toggleSort: (e) =>
