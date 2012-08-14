@@ -165,6 +165,8 @@ class Backbone.TableView extends Backbone.View
 
     # Set data and update collection
     setData: (key, val, key2, val2) =>
+        if key != "page" and key2 != "page"
+            @data.page = 1
         if val
             @data[key] = val
         else if key
