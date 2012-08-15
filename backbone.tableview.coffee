@@ -71,7 +71,7 @@ class Backbone.TableView extends Backbone.View
             <tr>
                 <% _.each(columns, function (col, name) { %>
                     <td class="<%= col.className || "" %>">
-                        <%= col.draw ? col.draw(row) : row.get(name) %>
+                        <%= col.draw ? col.draw(row) : row.get(name) || "" %>
                     </td>
                 <% }) %>
             </tr>
