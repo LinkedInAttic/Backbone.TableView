@@ -83,7 +83,7 @@ Backbone.TableView = (function(_super) {
 
   TableView.prototype.titleTemplate = _.template("<h2><%= model %></h2>");
 
-  TableView.prototype.searchTemplate = _.template("<input type=\"text\" class=\"search-query pull-right\" placeholder=\"<%= model.detail || model %>\" value=\"<%= data[model.query || \"q\"] || \"\" %>\"></input>");
+  TableView.prototype.searchTemplate = _.template("<input type=\"text\" class=\"search-query input-block-level pull-right\" placeholder=\"<%= model.detail || model %>\" value=\"<%= data[model.query || \"q\"] || \"\" %>\"></input>");
 
   TableView.prototype.paginationTemplate = _.template("<div class=\"row\">\n    <div class=\"span6\">\n        <div id=\"info\">Showing <%= from %> to <%= to %><%= total %></div>\n    </div>\n    <div class=\"span6\">\n        <div class=\"pagination\">\n            <ul>\n                <li class=\"pager-prev <%= prevDisabled %>\"><a href=\"javascript:void(0)\">← Previous</a></li>\n                <% _.each(pages, function (page) { %>\n                    <li class=\"<%= page.active %>\"><a href=\"javascript:void(0)\"><%= page.number %></a></li>\n                <% }) %>\n                <li class=\"pager-next <%= nextDisabled %>\"><a href=\"javascript:void(0)\">Next → </a></li>\n            </ul>\n        </div>\n    </div>\n</div>");
 
@@ -91,7 +91,7 @@ Backbone.TableView = (function(_super) {
 
   TableView.prototype.columnsTemplate = _.template("<% _.each(model, function (col, key) { %>\n    <th abbr=\"<%= key || col %>\"\n     class=\"<%= !col.nosort && \"sorting\" %> <%= ((key || col) == data.sort_col) && \"sorting_\" + data.sort_dir %> <%= col.className || \"\" %>\">\n        <%= col.header || key %>\n    </th>\n<% }) %>");
 
-  TableView.prototype.template = _.template("<div class=\"row-fluid\">\n    <div class=\"span2\">\n        <%= title %>\n    </div>\n\n    <div class=\"filters controls pagination-centered span8\">\n    </div>\n\n    <div class=\"span2\">\n        <%= search %>\n    </div>\n</div>\n\n<table class=\"table table-striped table-bordered\">\n    <thead>\n        <tr>\n            <%= columns %>\n        </tr>\n    </thead>\n    <tbody>\n        <tr>\n            <td colspan=\"10\"><%= empty %></td>\n        </tr>\n    </tbody>\n</table>\n\n<div id=\"pagination-main\">\n</div>");
+  TableView.prototype.template = _.template("<div class=\"row-fluid\">\n    <div class=\"span3\">\n        <%= title %>\n    </div>\n\n    <div class=\"filters controls pagination-centered span6\">\n    </div>\n\n    <div class=\"span3\">\n        <%= search %>\n    </div>\n</div>\n\n<table class=\"table table-striped table-bordered\">\n    <thead>\n        <tr>\n            <%= columns %>\n        </tr>\n    </thead>\n    <tbody>\n        <tr>\n            <td colspan=\"10\"><%= empty %></td>\n        </tr>\n    </tbody>\n</table>\n\n<div id=\"pagination-main\">\n</div>");
 
   TableView.prototype.events = {
     "change .search-query": "updateSearch",
@@ -138,7 +138,11 @@ Backbone.TableView = (function(_super) {
     this.data.page = 1;
     while (args.length > 1) {
       _ref = args, key = _ref[0], val = _ref[1], args = 3 <= _ref.length ? __slice.call(_ref, 2) : [];
-      this.data[key] = val;
+      if ((val != null) && (val === false || val === 0 || val)) {
+        this.data[key] = val;
+      } else {
+        delete this.data[key];
+      }
     }
     return this.update();
   };
@@ -395,7 +399,7 @@ ButtonFilter = (function(_super) {
     return ButtonFilter.__super__.constructor.apply(this, arguments);
   }
 
-  ButtonFilter.prototype.template = _.template("<button type=\"button\" class=\"filter btn <%= init == on ? \"active\" : \"\" %> <%= filterClass %>\" data-toggle=\"button\"><%= name %></button>");
+  ButtonFilter.prototype.template = _.template("<button type=\"button\" class=\"filter btn <%= init == on ? \"active\" : \"\" %> <%= filterClass %>\"><%= name %></button>");
 
   ButtonFilter.prototype.events = {
     "click .filter": "update"
@@ -407,7 +411,8 @@ ButtonFilter = (function(_super) {
     return this.current = this.options.init === this.options.off ? 0 : 1;
   };
 
-  ButtonFilter.prototype.update = function() {
+  ButtonFilter.prototype.update = function(e) {
+    $(e.currentTarget, this.$el).toggleClass("active");
     this.current = 1 - this.current;
     return this.setData(this.id, this.values[this.current]);
   };
@@ -435,9 +440,20 @@ ButtonOptionFilter = (function(_super) {
     var _this = this;
     ButtonOptionFilter.__super__.initialize.apply(this, arguments);
     return this.options.options = _.map(this.options.options, function(option) {
+      var name, value;
+      value = option;
+      if (_.isArray(value)) {
+        name = value[0];
+        value = value[1];
+      } else if (_.isObject(value)) {
+        name = option.name;
+        value = option.value;
+      } else {
+        name = _this.prettyName(option);
+      }
       return {
-        name: _this.prettyName(option.name || option),
-        value: option.value || option
+        name: name,
+        value: value
       };
     });
   };
