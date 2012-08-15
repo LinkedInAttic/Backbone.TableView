@@ -58,7 +58,7 @@ class Backbone.TableView extends Backbone.View
                     <ul>
                         <li class="pager-prev <%= prevDisabled %>"><a href="javascript:void(0)">← Previous</a></li>
                         <% _.each(pages, function (page) { %>
-                            <li class="<%= page.active %>"><a href="javascript:void(0)"><%= page.number %></a></li>
+                            <li class="pager-page <%= page.active %>"><a href="javascript:void(0)"><%= page.number %></a></li>
                         <% }) %>
                         <li class="pager-next <%= nextDisabled %>"><a href="javascript:void(0)">Next → </a></li>
                     </ul>
@@ -123,6 +123,7 @@ class Backbone.TableView extends Backbone.View
     events:
         "change .search-query":              "updateSearch"
         "click  th":                         "toggleSort"
+        "click  .pager-page:not(.active)":   "toPage"
         "click  .pager-prev:not(.disabled)": "prevPage"
         "click  .pager-next:not(.disabled)": "nextPage"
 
@@ -249,6 +250,10 @@ class Backbone.TableView extends Backbone.View
             empty:      @empty or "No records to show"
         if @pagination
             @refreshPagination()
+
+    # Go to a requested page
+    toPage: (e) =>
+        @setData "page", e.currentTarget
 
     # Go to the previous page in the collection
     prevPage: =>
