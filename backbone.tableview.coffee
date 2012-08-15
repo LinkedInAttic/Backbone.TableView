@@ -187,7 +187,7 @@ class Backbone.TableView extends Backbone.View
         filter.init = (filter.set or _.identity) @data[name] or filter.init or ""
         return filter
 
-    # Update collection only if event was trigger by an enter
+    # Update collection with search query
     updateSearch: (e) =>
         @setData @search.query or "q", e.currentTarget.value
 
