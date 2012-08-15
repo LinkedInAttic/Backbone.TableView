@@ -351,12 +351,11 @@ class ButtonFilter extends Filter
 
 class ButtonOptionFilter extends Filter
     template: _.template """
-        <div class="btn-group <%= filterClass %>" data-toggle="buttons-radio">
-            <% _.each(options, function (el, i) { %>
-                <button class="btn <%= init == el.value ? "active" : "" %>" value="<%= el.value %>"><%= el.name %></button>
-            <% }) %>
-        </div>
+        <% _.each(options, function (el, i) { %>
+            <button class="btn <%= init == el.value ? "active" : "" %>" value="<%= el.value %>"><%= el.name %></button>
+        <% }) %>
     """
+    className: "btn-group inline"
     events:
         "click .btn": "update"
 
@@ -376,4 +375,6 @@ class ButtonOptionFilter extends Filter
                 {name: name, value: value}
 
     update: (e) =>
+        $(".btn", @$el).removeClass "active"
+        $(e.currentTarget, @$el).addClass "active"
         @setData @id, e.currentTarget.value
