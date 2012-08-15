@@ -63,6 +63,8 @@ Backbone.TableView = (function(_super) {
 
     this.prevPage = __bind(this.prevPage, this);
 
+    this.toPage = __bind(this.toPage, this);
+
     this.renderData = __bind(this.renderData, this);
 
     this.refreshPagination = __bind(this.refreshPagination, this);
@@ -85,9 +87,9 @@ Backbone.TableView = (function(_super) {
 
   TableView.prototype.searchTemplate = _.template("<input type=\"text\" class=\"search-query input-block-level pull-right\" placeholder=\"<%= model.detail || model %>\" value=\"<%= data[model.query || \"q\"] || \"\" %>\"></input>");
 
-  TableView.prototype.paginationTemplate = _.template("<div class=\"row\">\n    <div class=\"span6\">\n        <div id=\"info\">Showing <%= from %> to <%= to %><%= total %></div>\n    </div>\n    <div class=\"span6\">\n        <div class=\"pagination\">\n            <ul>\n                <li class=\"pager-prev <%= prevDisabled %>\"><a href=\"javascript:void(0)\">← Previous</a></li>\n                <% _.each(pages, function (page) { %>\n                    <li class=\"<%= page.active %>\"><a href=\"javascript:void(0)\"><%= page.number %></a></li>\n                <% }) %>\n                <li class=\"pager-next <%= nextDisabled %>\"><a href=\"javascript:void(0)\">Next → </a></li>\n            </ul>\n        </div>\n    </div>\n</div>");
+  TableView.prototype.paginationTemplate = _.template("<div class=\"row\">\n    <div class=\"span6\">\n        <div id=\"info\">Showing <%= from %> to <%= to %><%= total %></div>\n    </div>\n    <div class=\"span6\">\n        <div class=\"pagination\">\n            <ul>\n                <li class=\"pager-prev <%= prevDisabled %>\"><a href=\"javascript:void(0)\">← Previous</a></li>\n                <% _.each(pages, function (page) { %>\n                    <li class=\"pager-page <%= page.active %>\"><a href=\"javascript:void(0)\"><%= page.number %></a></li>\n                <% }) %>\n                <li class=\"pager-next <%= nextDisabled %>\"><a href=\"javascript:void(0)\">Next → </a></li>\n            </ul>\n        </div>\n    </div>\n</div>");
 
-  TableView.prototype.dataTemplate = _.template("<% _.each(collection.models, function (row) { %>\n    <tr>\n        <% _.each(columns, function (col, name) { %>\n            <td class=\"<%= col.className || \"\" %>\">\n                <%= col.draw ? col.draw(row) : row.get(name) %>\n            </td>\n        <% }) %>\n    </tr>\n<% }) %>\n<% if (collection.models.length == 0) { %>\n    <tr>\n        <td colspan=\"10\"><%= empty %></td>\n    </tr>\n<% } %>");
+  TableView.prototype.dataTemplate = _.template("<% _.each(collection.models, function (row) { %>\n    <tr>\n        <% _.each(columns, function (col, name) { %>\n            <td class=\"<%= col.className || \"\" %>\">\n                <%= col.draw ? col.draw(row) : row.get(name) || \"\" %>\n            </td>\n        <% }) %>\n    </tr>\n<% }) %>\n<% if (collection.models.length == 0) { %>\n    <tr>\n        <td colspan=\"10\"><%= empty %></td>\n    </tr>\n<% } %>");
 
   TableView.prototype.columnsTemplate = _.template("<% _.each(model, function (col, key) { %>\n    <th abbr=\"<%= key || col %>\"\n     class=\"<%= !col.nosort && \"sorting\" %> <%= ((key || col) == data.sort_col) && \"sorting_\" + data.sort_dir %> <%= col.className || \"\" %>\">\n        <%= col.header || key %>\n    </th>\n<% }) %>");
 
@@ -96,6 +98,7 @@ Backbone.TableView = (function(_super) {
   TableView.prototype.events = {
     "change .search-query": "updateSearch",
     "click  th": "toggleSort",
+    "click  .pager-page:not(.active)": "toPage",
     "click  .pager-prev:not(.disabled)": "prevPage",
     "click  .pager-next:not(.disabled)": "nextPage"
   };
@@ -269,6 +272,10 @@ Backbone.TableView = (function(_super) {
     }
   };
 
+  TableView.prototype.toPage = function(e) {
+    return this.setData("page", e.currentTarget);
+  };
+
   TableView.prototype.prevPage = function() {
     return this.setData("page", this.data.page - 1);
   };
@@ -431,7 +438,9 @@ ButtonOptionFilter = (function(_super) {
     return ButtonOptionFilter.__super__.constructor.apply(this, arguments);
   }
 
-  ButtonOptionFilter.prototype.template = _.template("<div class=\"btn-group <%= filterClass %>\" data-toggle=\"buttons-radio\">\n    <% _.each(options, function (el, i) { %>\n        <button class=\"btn <%= init == el.value ? \"active\" : \"\" %>\" value=\"<%= el.value %>\"><%= el.name %></button>\n    <% }) %>\n</div>");
+  ButtonOptionFilter.prototype.template = _.template("<% _.each(options, function (el, i) { %>\n    <button class=\"btn <%= init == el.value ? \"active\" : \"\" %>\" value=\"<%= el.value %>\"><%= el.name %></button>\n<% }) %>");
+
+  ButtonOptionFilter.prototype.className = "btn-group inline";
 
   ButtonOptionFilter.prototype.events = {
     "click .btn": "update"
@@ -460,6 +469,8 @@ ButtonOptionFilter = (function(_super) {
   };
 
   ButtonOptionFilter.prototype.update = function(e) {
+    $(".btn", this.$el).removeClass("active");
+    $(e.currentTarget, this.$el).addClass("active");
     return this.setData(this.id, e.currentTarget.value);
   };
 
