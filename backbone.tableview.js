@@ -169,7 +169,6 @@ Backbone.TableView = (function(_super) {
       case "input":
         return new InputFilter({
           id: name,
-          className: "input-prepend inline",
           filterClass: filter.className || "",
           get: filter.get || _.identity,
           init: (filter.set || _.identity)(this.data[name] || filter.init || ""),
@@ -377,6 +376,8 @@ InputFilter = (function(_super) {
   }
 
   InputFilter.prototype.template = _.template("<span class=\"add-on\"><%= name %></span><input type=\"text\" class=\"filter <%= filterClass %>\" value=\"<%= init %>\"></input>");
+
+  InputFilter.prototype.className = "input-prepend inline";
 
   InputFilter.prototype.events = {
     "change .filter": "update"

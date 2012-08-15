@@ -180,7 +180,6 @@ class Backbone.TableView extends Backbone.View
             when "input"
                 return new InputFilter
                     id: name
-                    className: "input-prepend inline"
                     filterClass: filter.className or ""
                     get: filter.get or _.identity
                     init: (filter.set or _.identity) @data[name] or filter.init or ""
@@ -321,6 +320,7 @@ class InputFilter extends Filter
     template: _.template """
         <span class="add-on"><%= name %></span><input type="text" class="filter <%= filterClass %>" value="<%= init %>"></input>
     """
+    className: "input-prepend inline"
     events:
         "change .filter": "update"
 
