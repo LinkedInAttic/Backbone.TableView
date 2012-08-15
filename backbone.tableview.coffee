@@ -358,7 +358,17 @@ class ButtonOptionFilter extends Filter
     initialize: ->
         super
         @options.options = _.map @options.options,
-            (option) => {name: @prettyName(option.name or option), value: option.value or option}
+            (option) =>
+                value = option
+                if _.isArray value
+                    name = value[0]
+                    value = value[1]
+                else if _.isObject value
+                    name = option.name
+                    value = option.value
+                else
+                    name = @prettyName option
+                {name: name, value: value}
 
     update: (e) =>
         @setData @id, e.currentTarget.value
