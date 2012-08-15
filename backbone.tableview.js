@@ -47,7 +47,8 @@ Optionally it supports pagination, search, and any number of filters
 var ButtonFilter, ButtonOptionFilter, Filter, InputFilter,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   __hasProp = {}.hasOwnProperty,
-  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+  __slice = [].slice;
 
 Backbone.TableView = (function(_super) {
 
@@ -152,19 +153,13 @@ Backbone.TableView = (function(_super) {
     return ret;
   };
 
-  TableView.prototype.setData = function(key, val, key2, val2) {
-    if (key !== "page" && key2 !== "page") {
-      this.data.page = 1;
-    }
-    if (val) {
+  TableView.prototype.setData = function() {
+    var args, key, val, _ref;
+    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+    this.data.page = 1;
+    while (args.length > 1) {
+      _ref = args, key = _ref[0], val = _ref[1], args = 3 <= _ref.length ? __slice.call(_ref, 2) : [];
       this.data[key] = val;
-    } else if (key) {
-      delete this.data[key];
-    }
-    if (val2) {
-      this.data[key2] = val2;
-    } else if (key2) {
-      delete this.data[key2];
     }
     if (this.router) {
       this.updateUrl();

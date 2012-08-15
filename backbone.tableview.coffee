@@ -164,17 +164,11 @@ class Backbone.TableView extends Backbone.View
         return ret
 
     # Set data and update collection
-    setData: (key, val, key2, val2) =>
-        if key != "page" and key2 != "page"
-            @data.page = 1
-        if val
+    setData: (args...) =>
+        @data.page = 1
+        while args.length > 1
+            [key, val, args...] = args
             @data[key] = val
-        else if key
-            delete @data[key]
-        if val2
-            @data[key2] = val2
-        else if key2
-            delete @data[key2]
         if @router
             @updateUrl()
         @update()
