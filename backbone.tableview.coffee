@@ -136,21 +136,6 @@ class Backbone.TableView extends Backbone.View
         @data.size = parseInt(@data.size) or @size or 10
         return @
 
-    # Navigate to url with all the parameters in data in the querystring
-    updateUrl: =>
-        uri = Backbone.history.fragment
-        if (i = uri.indexOf "?") > 0
-            uri = uri.substring(0, i)
-        first = true
-        for key, val of @data
-            if first
-                first = false
-                separator = "?"
-            else
-                separator = "&"
-            uri = uri + separator + key + "=" + val
-        @router.navigate uri
-
     # Return a parsed querystring with the "?" (eg. query = "/users?hi=1&bye=hello")
     # returns {hi: "1", bye: "hello"}
     parseQueryString: (uri) ->
@@ -169,8 +154,6 @@ class Backbone.TableView extends Backbone.View
         while args.length > 1
             [key, val, args...] = args
             @data[key] = val
-        if @router
-            @updateUrl()
         @update()
 
     # Creates a filter from a filter config definition
@@ -208,10 +191,27 @@ class Backbone.TableView extends Backbone.View
     updateSearch: (e) =>
         @setData @search.query or "q", e.currentTarget.value
 
+    # Navigate to url with all the parameters in data in the querystring
+    updateUrl: =>
+        if @router
+            uri = Backbone.history.fragment
+            if (i = uri.indexOf "?") > 0
+                uri = uri.substring(0, i)
+            first = true
+            for key, val of @data
+                if first
+                    first = false
+                    separator = "?"
+                else
+                    separator = "&"
+                uri = uri + separator + key + "=" + val
+            @router.navigate uri
+        return @
+
     # Update the collection given all the options/filters
     update: =>
         @collection.fetch data: @data
-        return @
+        @updateUrl()
 
     # Refresh the pagination div at the bottom
     refreshPagination: =>

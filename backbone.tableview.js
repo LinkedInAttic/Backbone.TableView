@@ -69,13 +69,13 @@ Backbone.TableView = (function(_super) {
 
     this.update = __bind(this.update, this);
 
+    this.updateUrl = __bind(this.updateUrl, this);
+
     this.updateSearch = __bind(this.updateSearch, this);
 
     this.createFilter = __bind(this.createFilter, this);
 
     this.setData = __bind(this.setData, this);
-
-    this.updateUrl = __bind(this.updateUrl, this);
     return TableView.__super__.constructor.apply(this, arguments);
   }
 
@@ -116,27 +116,6 @@ Backbone.TableView = (function(_super) {
     return this;
   };
 
-  TableView.prototype.updateUrl = function() {
-    var first, i, key, separator, uri, val, _ref;
-    uri = Backbone.history.fragment;
-    if ((i = uri.indexOf("?")) > 0) {
-      uri = uri.substring(0, i);
-    }
-    first = true;
-    _ref = this.data;
-    for (key in _ref) {
-      val = _ref[key];
-      if (first) {
-        first = false;
-        separator = "?";
-      } else {
-        separator = "&";
-      }
-      uri = uri + separator + key + "=" + val;
-    }
-    return this.router.navigate(uri);
-  };
-
   TableView.prototype.parseQueryString = function(uri) {
     var decode, i, match, ret, search;
     ret = {};
@@ -160,9 +139,6 @@ Backbone.TableView = (function(_super) {
     while (args.length > 1) {
       _ref = args, key = _ref[0], val = _ref[1], args = 3 <= _ref.length ? __slice.call(_ref, 2) : [];
       this.data[key] = val;
-    }
-    if (this.router) {
-      this.updateUrl();
     }
     return this.update();
   };
@@ -205,11 +181,35 @@ Backbone.TableView = (function(_super) {
     return this.setData(this.search.query || "q", e.currentTarget.value);
   };
 
+  TableView.prototype.updateUrl = function() {
+    var first, i, key, separator, uri, val, _ref;
+    if (this.router) {
+      uri = Backbone.history.fragment;
+      if ((i = uri.indexOf("?")) > 0) {
+        uri = uri.substring(0, i);
+      }
+      first = true;
+      _ref = this.data;
+      for (key in _ref) {
+        val = _ref[key];
+        if (first) {
+          first = false;
+          separator = "?";
+        } else {
+          separator = "&";
+        }
+        uri = uri + separator + key + "=" + val;
+      }
+      this.router.navigate(uri);
+    }
+    return this;
+  };
+
   TableView.prototype.update = function() {
     this.collection.fetch({
       data: this.data
     });
-    return this;
+    return this.updateUrl();
   };
 
   TableView.prototype.refreshPagination = function() {
