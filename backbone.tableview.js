@@ -154,7 +154,7 @@ Backbone.TableView = (function(_super) {
           id: name,
           filterClass: filter.className || "",
           options: filter.options,
-          init: (filter.set || _.identity)(this.data[name] || filter.init || filter.options[0].value || filter.options[0]),
+          init: (filter.set || _.identity)(this.data[name] || filter.init || ""),
           setData: this.setData
         });
       case "button":

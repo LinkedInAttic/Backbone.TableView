@@ -167,7 +167,7 @@ class Backbone.TableView extends Backbone.View
                     id: name
                     filterClass: filter.className or ""
                     options: filter.options
-                    init: (filter.set or _.identity) @data[name] or filter.init or filter.options[0].value or filter.options[0]
+                    init: (filter.set or _.identity) @data[name] or filter.init or ""
                     setData: @setData
             when "button"
                 return new ButtonFilter
