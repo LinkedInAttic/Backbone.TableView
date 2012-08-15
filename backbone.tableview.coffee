@@ -153,7 +153,10 @@ class Backbone.TableView extends Backbone.View
         @data.page = 1
         while args.length > 1
             [key, val, args...] = args
-            @data[key] = val
+            if val? and (val == false or val == 0 or val)
+                @data[key] = val
+            else
+                delete @data[key]
         @update()
 
     # Creates a filter from a filter config definition
