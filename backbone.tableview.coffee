@@ -46,7 +46,7 @@ class Backbone.TableView extends Backbone.View
     tagName: "div"
     titleTemplate: _.template "<h2><%= model %></h2>"
     searchTemplate: _.template """
-        <input type="text" class="search-query pull-right" placeholder="<%= model.detail || model %>" value="<%= data[model.query || "q"] || "" %>"></input>
+        <input type="text" class="search-query input-block-level pull-right" placeholder="<%= model.detail || model %>" value="<%= data[model.query || "q"] || "" %>"></input>
     """
     paginationTemplate: _.template """
         <div class="row">
@@ -92,14 +92,14 @@ class Backbone.TableView extends Backbone.View
     """
     template: _.template """
         <div class="row-fluid">
-            <div class="span2">
+            <div class="span3">
                 <%= title %>
             </div>
 
-            <div class="filters controls pagination-centered span8">
+            <div class="filters controls pagination-centered span6">
             </div>
 
-            <div class="span2">
+            <div class="span3">
                 <%= search %>
             </div>
         </div>
