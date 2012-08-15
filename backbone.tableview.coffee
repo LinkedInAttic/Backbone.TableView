@@ -329,7 +329,7 @@ class InputFilter extends Filter
 
 class ButtonFilter extends Filter
     template: _.template """
-        <button type="button" class="filter btn <%= init == on ? "active" : "" %> <%= filterClass %>" data-toggle="button"><%= name %></button>
+        <button type="button" class="filter btn <%= init == on ? "active" : "" %> <%= filterClass %>"><%= name %></button>
     """
     events:
         "click .filter": "update"
@@ -339,7 +339,8 @@ class ButtonFilter extends Filter
         @values = [@options.off, @options.on]
         @current = if @options.init == @options.off then 0 else 1
 
-    update: =>
+    update: (e) =>
+        $(e.currentTarget, @$el).toggleClass "active"
         @current = 1 - @current
         @setData @id, @values[@current]
 
