@@ -298,7 +298,7 @@ class Backbone.TableView extends Backbone.View
 
         @filters = _.map(@filters, (filter, name) => @createFilter(name, filter))
         filtersDiv = $(".filters", @$el)
-        _.each @filters, (filter) -> filtersDiv.append filter.render().el, " "
+        _.each @filters, (filter) -> filtersDiv.append filter.render().el
         @update()
 
 ###
@@ -308,7 +308,7 @@ Filters
 
 class Filter extends Backbone.View
     tagName: "div"
-    className: "inline"
+    className: "inline pull-left"
 
     initialize: ->
         @id = @options.id
@@ -327,7 +327,7 @@ class InputFilter extends Filter
     template: _.template """
         <span class="add-on"><%= name %></span><input type="text" class="filter <%= filterClass %>" value="<%= init %>"></input>
     """
-    className: "input-prepend inline"
+    className: "input-prepend inline pull-left"
     events:
         "change .filter": "update"
 
@@ -357,7 +357,7 @@ class ButtonOptionFilter extends Filter
             <button class="btn <%= init == el.value ? "active" : "" %>" value="<%= el.value %>"><%= el.name %></button>
         <% }) %>
     """
-    className: "btn-group inline"
+    className: "btn-group inline pull-left"
     events:
         "click .btn": "update"
 
