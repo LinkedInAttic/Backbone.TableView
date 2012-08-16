@@ -114,8 +114,10 @@ Backbone.TableView = (function(_super) {
       }
     }
     this.data = $.extend({}, this.initialData, this.parseQueryString(Backbone.history.fragment));
-    this.data.page = parseInt(this.data.page) || this.page || 1;
-    this.data.size = parseInt(this.data.size) || this.size || 10;
+    if (this.pagination) {
+      this.data.page = parseInt(this.data.page) || this.page || 1;
+      this.data.size = parseInt(this.data.size) || this.size || 10;
+    }
     return this;
   };
 
@@ -325,7 +327,7 @@ Backbone.TableView = (function(_super) {
     });
     filtersDiv = $(".filters", this.$el);
     _.each(this.filters, function(filter) {
-      return filtersDiv.append(filter.render().el, " ");
+      return filtersDiv.append(filter.render().el);
     });
     return this.update();
   };
@@ -351,7 +353,7 @@ Filter = (function(_super) {
 
   Filter.prototype.tagName = "div";
 
-  Filter.prototype.className = "inline";
+  Filter.prototype.className = "inline pull-left";
 
   Filter.prototype.initialize = function() {
     this.id = this.options.id;
@@ -385,7 +387,7 @@ InputFilter = (function(_super) {
 
   InputFilter.prototype.template = _.template("<span class=\"add-on\"><%= name %></span><input type=\"text\" class=\"filter <%= filterClass %>\" value=\"<%= init %>\"></input>");
 
-  InputFilter.prototype.className = "input-prepend inline";
+  InputFilter.prototype.className = "input-prepend inline pull-left";
 
   InputFilter.prototype.events = {
     "change .filter": "update"
@@ -441,7 +443,7 @@ ButtonOptionFilter = (function(_super) {
 
   ButtonOptionFilter.prototype.template = _.template("<% _.each(options, function (el, i) { %>\n    <button class=\"btn <%= init == el.value ? \"active\" : \"\" %>\" value=\"<%= el.value %>\"><%= el.name %></button>\n<% }) %>");
 
-  ButtonOptionFilter.prototype.className = "btn-group inline";
+  ButtonOptionFilter.prototype.className = "btn-group inline pull-left";
 
   ButtonOptionFilter.prototype.events = {
     "click .btn": "update"
