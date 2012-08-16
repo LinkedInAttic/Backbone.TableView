@@ -133,8 +133,9 @@ class Backbone.TableView extends Backbone.View
         for key, val of @options
             if not this[key]? then this[key] = val
         @data = $.extend({}, @initialData, @parseQueryString Backbone.history.fragment)
-        @data.page = parseInt(@data.page) or @page or 1
-        @data.size = parseInt(@data.size) or @size or 10
+        if @pagination
+            @data.page = parseInt(@data.page) or @page or 1
+            @data.size = parseInt(@data.size) or @size or 10
         return @
 
     # Return a parsed querystring with the "?" (eg. query = "/users?hi=1&bye=hello")
