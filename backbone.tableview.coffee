@@ -138,8 +138,8 @@ class Backbone.TableView extends Backbone.View
             @data.size = parseInt(@data.size) or @size or 10
         return @
 
-    # Return a parsed querystring with the "?" (eg. query = "/users?hi=1&bye=hello")
-    # returns {hi: "1", bye: "hello"}
+    # Return a parsed querystring with the "?" (eg. query = "/users?hi=1&bye=hello"
+    # would return {hi: "1", bye: "hello"} )
     parseQueryString: (uri) ->
         ret = {}
         if (i = uri.indexOf("?")) >= 0
