@@ -276,7 +276,7 @@ Backbone.TableView = (function(_super) {
   };
 
   TableView.prototype.toPage = function(e) {
-    return this.setData("page", e.currentTarget);
+    return this.setData("page", parseInt(e.currentTarget.childNodes[0].text));
   };
 
   TableView.prototype.prevPage = function() {

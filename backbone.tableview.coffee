@@ -255,7 +255,7 @@ class Backbone.TableView extends Backbone.View
 
     # Go to a requested page
     toPage: (e) =>
-        @setData "page", e.currentTarget
+        @setData "page", parseInt e.currentTarget.childNodes[0].text
 
     # Go to the previous page in the collection
     prevPage: =>
