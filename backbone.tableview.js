@@ -268,8 +268,9 @@ Backbone.TableView = (function(_super) {
       empty: this.empty || "No records to show"
     }));
     if (this.pagination) {
-      return this.refreshPagination();
+      this.refreshPagination();
     }
+    return this;
   };
 
   TableView.prototype.toPage = function(e) {

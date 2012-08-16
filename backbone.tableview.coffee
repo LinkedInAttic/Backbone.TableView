@@ -250,6 +250,7 @@ class Backbone.TableView extends Backbone.View
             empty:      @empty or "No records to show"
         if @pagination
             @refreshPagination()
+        return @
 
     # Go to a requested page
     toPage: (e) =>
