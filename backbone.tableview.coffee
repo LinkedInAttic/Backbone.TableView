@@ -110,7 +110,7 @@ class Backbone.TableView extends Backbone.View
                     <%= columns %>
                 </tr>
             </thead>
-            <tbody>
+            <tbody class="fade">
                 <tr>
                     <td colspan="10"><%= empty %></td>
                 </tr>
@@ -214,6 +214,7 @@ class Backbone.TableView extends Backbone.View
 
     # Update the collection given all the options/filters
     update: =>
+        $("tbody", @$el).removeClass("in")
         @trigger "updating"
         @collection.fetch data: @data
         @updateUrl()
@@ -253,6 +254,7 @@ class Backbone.TableView extends Backbone.View
         if @pagination
             @refreshPagination()
         @trigger "updated"
+        $("tbody", @$el).addClass("in")
         return @
 
     # Go to a requested page
