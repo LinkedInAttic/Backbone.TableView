@@ -272,14 +272,12 @@ class Backbone.TableView extends Backbone.View
         sort_dir = ""
         if cl.indexOf("sorting_desc") >= 0
             sort_dir = "asc"
-            cl = "sorting_asc"
         else if cl.indexOf("sorting") >= 0
             sort_dir = "desc"
-            cl = "sorting_desc"
         else
             return @
         $("th", @$el).removeClass "sorting_desc sorting_asc"
-        $(el, @$el).addClass cl
+        $(el, @$el).addClass "sorting_" + sort_dir
         @setData "sort_col", el.abbr, "sort_dir", sort_dir
 
     # Apply a template to a model and return the result (string), or empty

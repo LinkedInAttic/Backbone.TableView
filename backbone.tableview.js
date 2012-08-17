@@ -294,15 +294,13 @@ Backbone.TableView = (function(_super) {
     sort_dir = "";
     if (cl.indexOf("sorting_desc") >= 0) {
       sort_dir = "asc";
-      cl = "sorting_asc";
     } else if (cl.indexOf("sorting") >= 0) {
       sort_dir = "desc";
-      cl = "sorting_desc";
     } else {
       return this;
     }
     $("th", this.$el).removeClass("sorting_desc sorting_asc");
-    $(el, this.$el).addClass(cl);
+    $(el, this.$el).addClass("sorting_" + sort_dir);
     return this.setData("sort_col", el.abbr, "sort_dir", sort_dir);
   };
 
