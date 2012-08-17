@@ -295,7 +295,7 @@ Backbone.TableView = (function(_super) {
     if (cl.indexOf("sorting_desc") >= 0) {
       sort_dir = "asc";
       cl = "sorting_asc";
-    } else if (cl.indexOf("sorting") >= 0 || cl.indexOf("sorting_asc") >= 0) {
+    } else if (cl.indexOf("sorting") >= 0) {
       sort_dir = "desc";
       cl = "sorting_desc";
     } else {
