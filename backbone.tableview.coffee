@@ -308,7 +308,7 @@ Filters
 
 class Filter extends Backbone.View
     tagName: "div"
-    className: "inline pull-left"
+    className: "pull-left filterbox"
 
     initialize: ->
         @id = @options.id
@@ -327,7 +327,7 @@ class InputFilter extends Filter
     template: _.template """
         <span class="add-on"><%= name %></span><input type="text" class="filter <%= filterClass %>" value="<%= init %>"></input>
     """
-    className: "input-prepend inline pull-left"
+    className: "input-prepend pull-left filterbox"
     events:
         "change .filter": "update"
 
@@ -357,7 +357,7 @@ class ButtonOptionFilter extends Filter
             <button class="btn <%= init == el.value ? "active" : "" %>" value="<%= el.value %>"><%= el.name %></button>
         <% }) %>
     """
-    className: "btn-group inline pull-left"
+    className: "btn-group pull-left filterbox"
     events:
         "click .btn": "update"
 

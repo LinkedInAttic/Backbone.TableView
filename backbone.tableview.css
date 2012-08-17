@@ -6,3 +6,11 @@ div.pagination {
     float: right;
     margin: 0;
 }
+
+.table th, .table td {
+    text-align: center;
+}
+
+.filterbox {
+    padding-right: 10px;
+}
