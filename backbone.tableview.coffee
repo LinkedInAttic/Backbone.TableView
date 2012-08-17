@@ -51,7 +51,7 @@ class Backbone.TableView extends Backbone.View
     paginationTemplate: _.template """
         <div class="row">
             <div class="span6">
-                <div id="info">Showing <%= from %> to <%= to %><%= total %></div>
+                <div class="tableview-info">Showing <%= from %> to <%= to %><%= total %></div>
             </div>
             <div class="span6">
                 <div class="pagination">
@@ -104,7 +104,7 @@ class Backbone.TableView extends Backbone.View
             </div>
         </div>
 
-        <table class="table table-striped table-bordered">
+        <table class="table table-striped">
             <thead>
                 <tr>
                     <%= columns %>
