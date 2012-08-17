@@ -14,3 +14,29 @@ div.pagination {
 .filterbox {
     padding-right: 10px;
 }
+
+.sorting:after {
+    content: "";
+    float: right;
+    margin-top: 7px;
+    border-width: 0 4px 4px;
+    border-style: solid;
+    border-color: black transparent;
+    visibility: hidden;
+}
+
+.sorting:hover:after {
+    visibility: visible;
+}
+
+.sorting_asc:after {
+    visibility: visible;
+}
+
+.sorting_desc:after {
+    border-bottom: none;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 4px solid black;
+    visibility: visible;
+}

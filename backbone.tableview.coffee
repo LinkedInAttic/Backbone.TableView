@@ -272,10 +272,10 @@ class Backbone.TableView extends Backbone.View
         el = e.currentTarget
         cl = el.className
         sort_dir = ""
-        if cl.indexOf("sorting_desc") >= 0
-            sort_dir = "asc"
-        else if cl.indexOf("sorting") >= 0
+        if cl.indexOf("sorting_asc") >= 0
             sort_dir = "desc"
+        else if cl.indexOf("sorting") >= 0
+            sort_dir = "asc"
         else
             return @
         $("th", @$el).removeClass "sorting_desc sorting_asc"
