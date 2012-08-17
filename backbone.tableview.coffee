@@ -214,6 +214,7 @@ class Backbone.TableView extends Backbone.View
 
     # Update the collection given all the options/filters
     update: =>
+        @trigger "updating"
         @collection.fetch data: @data
         @updateUrl()
 
@@ -251,6 +252,7 @@ class Backbone.TableView extends Backbone.View
             empty:      @empty or "No records to show"
         if @pagination
             @refreshPagination()
+        @trigger "updated"
         return @
 
     # Go to a requested page

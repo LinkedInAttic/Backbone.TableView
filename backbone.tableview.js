@@ -214,6 +214,7 @@ Backbone.TableView = (function(_super) {
   };
 
   TableView.prototype.update = function() {
+    this.trigger("updating");
     this.collection.fetch({
       data: this.data
     });
@@ -272,6 +273,7 @@ Backbone.TableView = (function(_super) {
     if (this.pagination) {
       this.refreshPagination();
     }
+    this.trigger("updated");
     return this;
   };
 
