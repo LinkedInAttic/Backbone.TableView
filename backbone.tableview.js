@@ -87,13 +87,13 @@ Backbone.TableView = (function(_super) {
 
   TableView.prototype.searchTemplate = _.template("<input type=\"text\" class=\"search-query input-block-level pull-right\" placeholder=\"<%= model.detail || model %>\" value=\"<%= data[model.query || \"q\"] || \"\" %>\"></input>");
 
-  TableView.prototype.paginationTemplate = _.template("<div class=\"row\">\n    <div class=\"span6\">\n        <div id=\"info\">Showing <%= from %> to <%= to %><%= total %></div>\n    </div>\n    <div class=\"span6\">\n        <div class=\"pagination\">\n            <ul>\n                <li class=\"pager-prev <%= prevDisabled %>\"><a href=\"javascript:void(0)\">← Previous</a></li>\n                <% _.each(pages, function (page) { %>\n                    <li class=\"pager-page <%= page.active %>\"><a href=\"javascript:void(0)\"><%= page.number %></a></li>\n                <% }) %>\n                <li class=\"pager-next <%= nextDisabled %>\"><a href=\"javascript:void(0)\">Next → </a></li>\n            </ul>\n        </div>\n    </div>\n</div>");
+  TableView.prototype.paginationTemplate = _.template("<div class=\"row\">\n    <div class=\"span6\">\n        <div class=\"tableview-info\">Showing <%= from %> to <%= to %><%= total %></div>\n    </div>\n    <div class=\"span6\">\n        <div class=\"pagination\">\n            <ul>\n                <li class=\"pager-prev <%= prevDisabled %>\"><a href=\"javascript:void(0)\">← Previous</a></li>\n                <% _.each(pages, function (page) { %>\n                    <li class=\"pager-page <%= page.active %>\"><a href=\"javascript:void(0)\"><%= page.number %></a></li>\n                <% }) %>\n                <li class=\"pager-next <%= nextDisabled %>\"><a href=\"javascript:void(0)\">Next → </a></li>\n            </ul>\n        </div>\n    </div>\n</div>");
 
   TableView.prototype.dataTemplate = _.template("<% _.each(collection.models, function (row) { %>\n    <tr>\n        <% _.each(columns, function (col, name) { %>\n            <td class=\"<%= col.className || \"\" %>\">\n                <%= col.draw ? col.draw(row) : row.get(name) || \"\" %>\n            </td>\n        <% }) %>\n    </tr>\n<% }) %>\n<% if (collection.models.length == 0) { %>\n    <tr>\n        <td colspan=\"10\"><%= empty %></td>\n    </tr>\n<% } %>");
 
   TableView.prototype.columnsTemplate = _.template("<% _.each(model, function (col, key) { %>\n    <th abbr=\"<%= key || col %>\"\n     class=\"<%= !col.nosort && \"sorting\" %> <%= ((key || col) == data.sort_col) && \"sorting_\" + data.sort_dir %> <%= col.className || \"\" %>\">\n        <%= col.header || key %>\n    </th>\n<% }) %>");
 
-  TableView.prototype.template = _.template("<div class=\"row-fluid\">\n    <div class=\"span3\">\n        <%= title %>\n    </div>\n\n    <div class=\"filters controls pagination-centered span6\">\n    </div>\n\n    <div class=\"span3\">\n        <%= search %>\n    </div>\n</div>\n\n<table class=\"table table-striped table-bordered\">\n    <thead>\n        <tr>\n            <%= columns %>\n        </tr>\n    </thead>\n    <tbody>\n        <tr>\n            <td colspan=\"10\"><%= empty %></td>\n        </tr>\n    </tbody>\n</table>\n\n<div id=\"pagination-main\">\n</div>");
+  TableView.prototype.template = _.template("<div class=\"row-fluid\">\n    <div class=\"span3\">\n        <%= title %>\n    </div>\n\n    <div class=\"filters controls pagination-centered span6\">\n    </div>\n\n    <div class=\"span3\">\n        <%= search %>\n    </div>\n</div>\n\n<table class=\"table table-striped\">\n    <thead>\n        <tr>\n            <%= columns %>\n        </tr>\n    </thead>\n    <tbody>\n        <tr>\n            <td colspan=\"10\"><%= empty %></td>\n        </tr>\n    </tbody>\n</table>\n\n<div id=\"pagination-main\">\n</div>");
 
   TableView.prototype.events = {
     "change .search-query": "updateSearch",
@@ -294,10 +294,10 @@ Backbone.TableView = (function(_super) {
     el = e.currentTarget;
     cl = el.className;
     sort_dir = "";
-    if (cl.indexOf("sorting_desc") >= 0) {
-      sort_dir = "asc";
-    } else if (cl.indexOf("sorting") >= 0) {
+    if (cl.indexOf("sorting_asc") >= 0) {
       sort_dir = "desc";
+    } else if (cl.indexOf("sorting") >= 0) {
+      sort_dir = "asc";
     } else {
       return this;
     }
@@ -353,7 +353,7 @@ Filter = (function(_super) {
 
   Filter.prototype.tagName = "div";
 
-  Filter.prototype.className = "inline pull-left";
+  Filter.prototype.className = "pull-left filterbox";
 
   Filter.prototype.initialize = function() {
     this.id = this.options.id;
@@ -387,7 +387,7 @@ InputFilter = (function(_super) {
 
   InputFilter.prototype.template = _.template("<span class=\"add-on\"><%= name %></span><input type=\"text\" class=\"filter <%= filterClass %>\" value=\"<%= init %>\"></input>");
 
-  InputFilter.prototype.className = "input-prepend inline pull-left";
+  InputFilter.prototype.className = "input-prepend pull-left filterbox";
 
   InputFilter.prototype.events = {
     "change .filter": "update"
@@ -443,7 +443,7 @@ ButtonOptionFilter = (function(_super) {
 
   ButtonOptionFilter.prototype.template = _.template("<% _.each(options, function (el, i) { %>\n    <button class=\"btn <%= init == el.value ? \"active\" : \"\" %>\" value=\"<%= el.value %>\"><%= el.name %></button>\n<% }) %>");
 
-  ButtonOptionFilter.prototype.className = "btn-group inline pull-left";
+  ButtonOptionFilter.prototype.className = "btn-group pull-left filterbox";
 
   ButtonOptionFilter.prototype.events = {
     "click .btn": "update"
