@@ -178,9 +178,11 @@ class Backbone.TableView extends Backbone.View
             when "input"
                 return new InputFilter
                     id: name
+                    extraId: filter.extraId
                     filterClass: filter.className or ""
                     get: filter.get or _.identity
-                    init: (filter.set or _.identity) @data[name] or filter.init or ""
+                    getExtraId: filter.getExtraId or _.identity
+                    init: (filter.set or _.identity) @data[name] or filter.init or "", @data[filter.extraId] or filter.extraInit or ""
                     setData: @setData
         # For custom filters, we just provide the setData function
         filter.setData = @setData
@@ -310,6 +312,7 @@ class Filter extends Backbone.View
 
     initialize: ->
         @id = @options.id
+        @extraId = @options.extraId
         @setData = @options.setData
 
     # Helper function to prettify names (eg. hi_world -> Hi World)
@@ -317,7 +320,7 @@ class Filter extends Backbone.View
         str.charAt(0).toUpperCase() + str.substring(1).replace(/_(\w)/g, (match, p1) -> " " + p1.toUpperCase())
 
     render: =>
-        @options.name = @prettyName(@id)
+        @options.name = @prettyName @id
         @$el.html @template @options
         return @
 
@@ -330,7 +333,10 @@ class InputFilter extends Filter
         "change .filter": "update"
 
     update: (e) =>
-        @setData @id, @options.get e.currentTarget.value
+        if @extraId
+            @setData @id, @options.get(e.currentTarget.value), @extraId, @options.getExtraId(e.currentTarget.value)
+        else
+            @setData @id, @options.get e.currentTarget.value
 
 class ButtonFilter extends Filter
     template: _.template """

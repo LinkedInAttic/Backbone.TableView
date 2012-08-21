@@ -174,9 +174,11 @@ Backbone.TableView = (function(_super) {
       case "input":
         return new InputFilter({
           id: name,
+          extraId: filter.extraId,
           filterClass: filter.className || "",
           get: filter.get || _.identity,
-          init: (filter.set || _.identity)(this.data[name] || filter.init || ""),
+          getExtraId: filter.getExtraId || _.identity,
+          init: (filter.set || _.identity)(this.data[name] || filter.init || "", this.data[filter.extraId] || filter.extraInit || ""),
           setData: this.setData
         });
     }
@@ -359,6 +361,7 @@ Filter = (function(_super) {
 
   Filter.prototype.initialize = function() {
     this.id = this.options.id;
+    this.extraId = this.options.extraId;
     return this.setData = this.options.setData;
   };
 
@@ -396,7 +399,11 @@ InputFilter = (function(_super) {
   };
 
   InputFilter.prototype.update = function(e) {
-    return this.setData(this.id, this.options.get(e.currentTarget.value));
+    if (this.extraId) {
+      return this.setData(this.id, this.options.get(e.currentTarget.value), this.extraId, this.options.getExtraId(e.currentTarget.value));
+    } else {
+      return this.setData(this.id, this.options.get(e.currentTarget.value));
+    }
   };
 
   return InputFilter;
