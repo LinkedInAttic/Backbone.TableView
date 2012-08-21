@@ -93,7 +93,7 @@ Backbone.TableView = (function(_super) {
 
   TableView.prototype.columnsTemplate = _.template("<% _.each(model, function (col, key) { %>\n    <th abbr=\"<%= key || col %>\"\n     class=\"<%= !col.nosort && \"sorting\" %> <%= ((key || col) == data.sort_col) && \"sorting_\" + data.sort_dir %> <%= col.className || \"\" %>\">\n        <%= col.header || key %>\n    </th>\n<% }) %>");
 
-  TableView.prototype.template = _.template("<div class=\"row-fluid\">\n    <div class=\"span3\">\n        <%= title %>\n    </div>\n\n    <div class=\"filters controls pagination-centered span6\">\n    </div>\n\n    <div class=\"span3\">\n        <%= search %>\n    </div>\n</div>\n\n<table class=\"table table-striped\">\n    <thead>\n        <tr>\n            <%= columns %>\n        </tr>\n    </thead>\n    <tbody class=\"fade\">\n        <tr>\n            <td colspan=\"10\"><%= empty %></td>\n        </tr>\n    </tbody>\n</table>\n\n<div id=\"pagination-main\">\n</div>");
+  TableView.prototype.template = _.template("<div class=\"row-fluid\">\n    <div class=\"filters controls pagination-centered span9\">\n    </div>\n\n    <div class=\"span3\">\n        <%= search %>\n    </div>\n</div>\n\n<table class=\"table table-striped\">\n    <thead>\n        <tr>\n            <%= columns %>\n        </tr>\n    </thead>\n    <tbody class=\"fade\">\n        <tr>\n            <td colspan=\"10\"><%= empty %></td>\n        </tr>\n    </tbody>\n</table>\n\n<div id=\"pagination-main\">\n</div>");
 
   TableView.prototype.events = {
     "change .search-query": "updateSearch",

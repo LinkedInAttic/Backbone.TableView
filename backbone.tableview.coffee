@@ -92,11 +92,7 @@ class Backbone.TableView extends Backbone.View
     """
     template: _.template """
         <div class="row-fluid">
-            <div class="span3">
-                <%= title %>
-            </div>
-
-            <div class="filters controls pagination-centered span6">
+            <div class="filters controls pagination-centered span9">
             </div>
 
             <div class="span3">
