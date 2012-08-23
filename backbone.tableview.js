@@ -55,6 +55,8 @@ Backbone.TableView = (function(_super) {
   __extends(TableView, _super);
 
   function TableView() {
+    this.firstOf = __bind(this.firstOf, this);
+
     this.render = __bind(this.render, this);
 
     this.toggleSort = __bind(this.toggleSort, this);
@@ -157,6 +159,7 @@ Backbone.TableView = (function(_super) {
       case "option":
         return new ButtonOptionFilter({
           id: name,
+          name: filter.name || this.prettyName(name),
           filterClass: filter.className || "",
           options: filter.options,
           init: (filter.set || _.identity)(this.data[name] || filter.init || ""),
@@ -165,8 +168,9 @@ Backbone.TableView = (function(_super) {
       case "button":
         return new ButtonFilter({
           id: name,
-          off: filter.off || "false",
-          on: filter.on || "true",
+          name: filter.name || this.prettyName(name),
+          off: this.firstOf(filter.off, "false"),
+          on: this.firstOf(filter.on, "true"),
           filterClass: filter.className || "",
           init: (filter.set || _.identity)(this.data[name] || filter.init || filter.off || "false"),
           setData: this.setData
@@ -174,6 +178,7 @@ Backbone.TableView = (function(_super) {
       case "input":
         return new InputFilter({
           id: name,
+          name: filter.name || this.prettyName(name),
           extraId: filter.extraId,
           filterClass: filter.className || "",
           get: filter.get || _.identity,
@@ -336,6 +341,24 @@ Backbone.TableView = (function(_super) {
     return this.update();
   };
 
+  TableView.prototype.prettyName = function(str) {
+    return str.charAt(0).toUpperCase() + str.substring(1).replace(/_(\w)/g, function(match, p1) {
+      return " " + p1.toUpperCase();
+    });
+  };
+
+  TableView.prototype.firstOf = function() {
+    var arg, args, index;
+    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+    for (index in args) {
+      arg = args[index];
+      if (arg != null) {
+        return arg;
+      }
+    }
+    return null;
+  };
+
   return TableView;
 
 })(Backbone.View);
@@ -365,14 +388,7 @@ Filter = (function(_super) {
     return this.setData = this.options.setData;
   };
 
-  Filter.prototype.prettyName = function(str) {
-    return str.charAt(0).toUpperCase() + str.substring(1).replace(/_(\w)/g, function(match, p1) {
-      return " " + p1.toUpperCase();
-    });
-  };
-
   Filter.prototype.render = function() {
-    this.options.name = this.prettyName(this.id);
     this.$el.html(this.template(this.options));
     return this;
   };

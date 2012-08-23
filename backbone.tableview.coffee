@@ -163,6 +163,7 @@ class Backbone.TableView extends Backbone.View
             when "option"
                 return new ButtonOptionFilter
                     id: name
+                    name: filter.name or @prettyName name
                     filterClass: filter.className or ""
                     options: filter.options
                     init: (filter.set or _.identity) @data[name] or filter.init or ""
@@ -170,14 +171,16 @@ class Backbone.TableView extends Backbone.View
             when "button"
                 return new ButtonFilter
                     id: name
-                    off: filter.off or "false"
-                    on: filter.on or "true"
+                    name: filter.name or @prettyName name
+                    off: @firstOf filter.off, "false"
+                    on: @firstOf filter.on, "true"
                     filterClass: filter.className or ""
                     init: (filter.set or _.identity) @data[name] or filter.init or filter.off or "false"
                     setData: @setData
             when "input"
                 return new InputFilter
                     id: name
+                    name: filter.name or @prettyName name
                     extraId: filter.extraId
                     filterClass: filter.className or ""
                     get: filter.get or _.identity
@@ -301,6 +304,16 @@ class Backbone.TableView extends Backbone.View
         _.each @filters, (filter) -> filtersDiv.append filter.render().el
         @update()
 
+    # Helper function to prettify names (eg. hi_world -> Hi World)
+    prettyName: (str) ->
+        str.charAt(0).toUpperCase() + str.substring(1).replace(/_(\w)/g, (match, p1) -> " " + p1.toUpperCase())
+
+    # Helper function that returns the first non-null argument
+    firstOf: (args...) =>
+        for index, arg of args
+            if arg? then return arg
+        return null
+
 ###
 Filters
 -------
@@ -315,12 +328,7 @@ class Filter extends Backbone.View
         @extraId = @options.extraId
         @setData = @options.setData
 
-    # Helper function to prettify names (eg. hi_world -> Hi World)
-    prettyName: (str) ->
-        str.charAt(0).toUpperCase() + str.substring(1).replace(/_(\w)/g, (match, p1) -> " " + p1.toUpperCase())
-
     render: =>
-        @options.name = @prettyName @id
         @$el.html @template @options
         return @
 
