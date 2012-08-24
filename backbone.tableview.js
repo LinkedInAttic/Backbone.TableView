@@ -126,7 +126,7 @@ Backbone.TableView = (function(_super) {
   TableView.prototype.parseQueryString = function(uri) {
     var decode, i, match, ret, search;
     ret = {};
-    if ((i = uri.indexOf("?")) >= 0) {
+    if (uri && (i = uri.indexOf("?")) >= 0) {
       uri = uri.substring(i + 1);
       search = /([^&=]+)=?([^&]*)/g;
       decode = function(s) {

@@ -138,7 +138,7 @@ class Backbone.TableView extends Backbone.View
     # would return {hi: "1", bye: "hello"} )
     parseQueryString: (uri) ->
         ret = {}
-        if (i = uri.indexOf("?")) >= 0
+        if uri and (i = uri.indexOf("?")) >= 0
             uri    = uri.substring(i + 1)
             search = /([^&=]+)=?([^&]*)/g
             decode = (s) -> decodeURIComponent(s.replace(/\+/g, " "))
