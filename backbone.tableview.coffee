@@ -385,7 +385,7 @@ class ButtonOptionFilter extends Filter
                     name = option.name
                     value = option.value
                 else
-                    name = @prettyName option
+                    name = option
                 {name: name, value: value}
 
     update: (e) =>

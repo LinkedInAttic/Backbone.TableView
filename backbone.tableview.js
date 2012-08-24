@@ -487,7 +487,7 @@ ButtonOptionFilter = (function(_super) {
         name = option.name;
         value = option.value;
       } else {
-        name = _this.prettyName(option);
+        name = option;
       }
       return {
         name: name,
