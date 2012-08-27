@@ -46,7 +46,7 @@ class Backbone.TableView extends Backbone.View
     tagName: "div"
     titleTemplate: _.template """
         <div class="<%= classSize %>">
-            <h4><%= model %></h4>
+            <h4 class="<%= model.className || "" %>"><%= model.name || model %></h4>
         </div>
     """
     filtersTemplate: _.template """

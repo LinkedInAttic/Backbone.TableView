@@ -85,7 +85,7 @@ Backbone.TableView = (function(_super) {
 
   TableView.prototype.tagName = "div";
 
-  TableView.prototype.titleTemplate = _.template("<div class=\"<%= classSize %>\">\n    <h4><%= model %></h4>\n</div>");
+  TableView.prototype.titleTemplate = _.template("<div class=\"<%= classSize %>\">\n    <h4 class=\"<%= model.className || \"\" %>\"><%= model.name || model %></h4>\n</div>");
 
   TableView.prototype.filtersTemplate = _.template("<div class=\"filters controls pagination-centered <%= classSize %>\">\n</div>");
 
