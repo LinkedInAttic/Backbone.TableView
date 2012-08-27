@@ -138,9 +138,8 @@ class Backbone.TableView extends Backbone.View
         for key, val of @options
             if not this[key]? then this[key] = val
         @data = $.extend({}, @initialData, @parseQueryString Backbone.history.fragment)
-        if @pagination
-            @data.page = parseInt(@data.page) or @page or 1
-            @data.size = parseInt(@data.size) or @size or 10
+        @data.page = parseInt(@data.page) or @page or 1
+        @data.size = parseInt(@data.size) or @size or 10
         return @
 
     # Return a parsed querystring with the "?" (eg. query = "/users?hi=1&bye=hello"
@@ -306,6 +305,9 @@ class Backbone.TableView extends Backbone.View
         titleSize = 3
         filtersSize = 6
         searchSize = 3
+        if not @search?
+            filtersSize += searchSize
+            searchSize = 0
         if not @title?
             filtersSize += titleSize
             titleSize = 0
@@ -319,9 +321,9 @@ class Backbone.TableView extends Backbone.View
             filters: @applyTemplate @filtersTemplate, @filters, filtersSize
             columns: @applyTemplate @columnsTemplate, @columns
 
-        @filters = _.map(@filters, (filter, name) => @createFilter(name, filter))
+        filters = _.map(@filters, (filter, name) => @createFilter(name, filter))
         filtersDiv = $(".filters", @$el)
-        _.each @filters, (filter) -> filtersDiv.append filter.render().el
+        _.each filters, (filter) -> filtersDiv.append filter.render().el
         @update()
 
     # Helper function to prettify names (eg. hi_world -> Hi World)

@@ -118,10 +118,8 @@ Backbone.TableView = (function(_super) {
       }
     }
     this.data = $.extend({}, this.initialData, this.parseQueryString(Backbone.history.fragment));
-    if (this.pagination) {
-      this.data.page = parseInt(this.data.page) || this.page || 1;
-      this.data.size = parseInt(this.data.size) || this.size || 10;
-    }
+    this.data.page = parseInt(this.data.page) || this.page || 1;
+    this.data.size = parseInt(this.data.size) || this.size || 10;
     return this;
   };
 
@@ -329,11 +327,15 @@ Backbone.TableView = (function(_super) {
   };
 
   TableView.prototype.render = function() {
-    var filtersDiv, filtersSize, searchSize, titleSize,
+    var filters, filtersDiv, filtersSize, searchSize, titleSize,
       _this = this;
     titleSize = 3;
     filtersSize = 6;
     searchSize = 3;
+    if (!(this.search != null)) {
+      filtersSize += searchSize;
+      searchSize = 0;
+    }
     if (!(this.title != null)) {
       filtersSize += titleSize;
       titleSize = 0;
@@ -348,11 +350,11 @@ Backbone.TableView = (function(_super) {
       filters: this.applyTemplate(this.filtersTemplate, this.filters, filtersSize),
       columns: this.applyTemplate(this.columnsTemplate, this.columns)
     }));
-    this.filters = _.map(this.filters, function(filter, name) {
+    filters = _.map(this.filters, function(filter, name) {
       return _this.createFilter(name, filter);
     });
     filtersDiv = $(".filters", this.$el);
-    _.each(this.filters, function(filter) {
+    _.each(filters, function(filter) {
       return filtersDiv.append(filter.render().el);
     });
     return this.update();
