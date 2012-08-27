@@ -85,9 +85,11 @@ Backbone.TableView = (function(_super) {
 
   TableView.prototype.tagName = "div";
 
-  TableView.prototype.titleTemplate = _.template("<h2><%= model %></h2>");
+  TableView.prototype.titleTemplate = _.template("<div class=\"<%= classSize %>\">\n    <h4><%= model %></h4>\n</div>");
 
-  TableView.prototype.searchTemplate = _.template("<input type=\"text\" class=\"search-query input-block-level pull-right\" placeholder=\"<%= model.detail || model %>\" value=\"<%= data[model.query || \"q\"] || \"\" %>\"></input>");
+  TableView.prototype.filtersTemplate = _.template("<div class=\"filters controls pagination-centered <%= classSize %>\">\n</div>");
+
+  TableView.prototype.searchTemplate = _.template("<div class=\"<%= classSize %>\">\n    <input type=\"text\" class=\"search-query input-block-level pull-right\" placeholder=\"<%= model.detail || model %>\" value=\"<%= data[model.query || \"q\"] || \"\" %>\"></input>\n</div>");
 
   TableView.prototype.paginationTemplate = _.template("<div class=\"row\">\n    <div class=\"span6\">\n        <div class=\"tableview-info\">Showing <%= from %> to <%= to %><%= total %></div>\n    </div>\n    <div class=\"span6\">\n        <div class=\"pagination\">\n            <ul>\n                <li class=\"pager-prev <%= prevDisabled %>\"><a href=\"javascript:void(0)\">← Previous</a></li>\n                <% _.each(pages, function (page) { %>\n                    <li class=\"pager-page <%= page.active %>\"><a href=\"javascript:void(0)\"><%= page.number %></a></li>\n                <% }) %>\n                <li class=\"pager-next <%= nextDisabled %>\"><a href=\"javascript:void(0)\">Next → </a></li>\n            </ul>\n        </div>\n    </div>\n</div>");
 
@@ -95,7 +97,7 @@ Backbone.TableView = (function(_super) {
 
   TableView.prototype.columnsTemplate = _.template("<% _.each(model, function (col, key) { %>\n    <th abbr=\"<%= key || col %>\"\n     class=\"<%= !col.nosort && \"sorting\" %> <%= ((key || col) == data.sort_col) && \"sorting_\" + data.sort_dir %> <%= col.className || \"\" %>\">\n        <%= col.header || key %>\n    </th>\n<% }) %>");
 
-  TableView.prototype.template = _.template("<div class=\"row-fluid\">\n    <div class=\"filters controls pagination-centered span9\">\n    </div>\n\n    <div class=\"span3\">\n        <%= search %>\n    </div>\n</div>\n\n<table class=\"table table-striped\">\n    <thead>\n        <tr>\n            <%= columns %>\n        </tr>\n    </thead>\n    <tbody class=\"fade\">\n        <tr>\n            <td colspan=\"10\"><%= empty %></td>\n        </tr>\n    </tbody>\n</table>\n\n<div id=\"pagination-main\">\n</div>");
+  TableView.prototype.template = _.template("<div class=\"row-fluid\">\n    <%= title %>\n\n    <%= filters %>\n\n    <%= search %>\n</div>\n\n<table class=\"table table-striped\">\n    <thead>\n        <tr>\n            <%= columns %>\n        </tr>\n    </thead>\n    <tbody class=\"fade\">\n        <tr>\n            <td colspan=\"10\"><%= empty %></td>\n        </tr>\n    </tbody>\n</table>\n\n<div id=\"pagination-main\">\n</div>");
 
   TableView.prototype.events = {
     "change .search-query": "updateSearch",
@@ -315,20 +317,35 @@ Backbone.TableView = (function(_super) {
     return this.setData("sort_col", el.abbr, "sort_dir", sort_dir);
   };
 
-  TableView.prototype.applyTemplate = function(template, model) {
-    return (model && template({
+  TableView.prototype.applyTemplate = function(template, model, size) {
+    if (!(size != null)) {
+      size = 12;
+    }
+    return (model && size && template({
       data: this.data,
-      model: model
+      model: model,
+      classSize: "span" + size
     })) || "";
   };
 
   TableView.prototype.render = function() {
-    var filtersDiv,
+    var filtersDiv, filtersSize, searchSize, titleSize,
       _this = this;
+    titleSize = 3;
+    filtersSize = 6;
+    searchSize = 3;
+    if (!(this.title != null)) {
+      filtersSize += titleSize;
+      titleSize = 0;
+    } else if (!(this.filters != null)) {
+      titleSize += filtersSize;
+      filtersSize = 0;
+    }
     this.$el.html(this.template({
       empty: this.empty || "",
-      title: this.applyTemplate(this.titleTemplate, this.title),
-      search: this.applyTemplate(this.searchTemplate, this.search),
+      title: this.applyTemplate(this.titleTemplate, this.title, titleSize),
+      search: this.applyTemplate(this.searchTemplate, this.search, searchSize),
+      filters: this.applyTemplate(this.filtersTemplate, this.filters, filtersSize),
       columns: this.applyTemplate(this.columnsTemplate, this.columns)
     }));
     this.filters = _.map(this.filters, function(filter, name) {

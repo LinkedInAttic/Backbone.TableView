@@ -44,9 +44,19 @@ Optionally it supports pagination, search, and any number of filters
 ###
 class Backbone.TableView extends Backbone.View
     tagName: "div"
-    titleTemplate: _.template "<h2><%= model %></h2>"
+    titleTemplate: _.template """
+        <div class="<%= classSize %>">
+            <h4><%= model %></h4>
+        </div>
+    """
+    filtersTemplate: _.template """
+        <div class="filters controls pagination-centered <%= classSize %>">
+        </div>
+    """
     searchTemplate: _.template """
-        <input type="text" class="search-query input-block-level pull-right" placeholder="<%= model.detail || model %>" value="<%= data[model.query || "q"] || "" %>"></input>
+        <div class="<%= classSize %>">
+            <input type="text" class="search-query input-block-level pull-right" placeholder="<%= model.detail || model %>" value="<%= data[model.query || "q"] || "" %>"></input>
+        </div>
     """
     paginationTemplate: _.template """
         <div class="row">
@@ -92,12 +102,11 @@ class Backbone.TableView extends Backbone.View
     """
     template: _.template """
         <div class="row-fluid">
-            <div class="filters controls pagination-centered span9">
-            </div>
+            <%= title %>
 
-            <div class="span3">
-                <%= search %>
-            </div>
+            <%= filters %>
+
+            <%= search %>
         </div>
 
         <table class="table table-striped">
@@ -287,17 +296,28 @@ class Backbone.TableView extends Backbone.View
 
     # Apply a template to a model and return the result (string), or empty
     # string if model is false/undefined
-    applyTemplate: (template, model) ->
-        (model and template data: @data, model: model) or ""
+    applyTemplate: (template, model, size) ->
+        if not size? then size = 12
+        (model and size and template data: @data, model: model, classSize: "span" + size) or ""
 
     # Render skeleton of the table, creating filters and other additions,
     # and trigger an update of the collection
     render: =>
+        titleSize = 3
+        filtersSize = 6
+        searchSize = 3
+        if not @title?
+            filtersSize += titleSize
+            titleSize = 0
+        else if not @filters?
+            titleSize += filtersSize
+            filtersSize = 0
         @$el.html @template
-            empty:      @empty or ""
-            title:      @applyTemplate @titleTemplate,   @title
-            search:     @applyTemplate @searchTemplate,  @search
-            columns:    @applyTemplate @columnsTemplate, @columns
+            empty:   @empty or ""
+            title:   @applyTemplate @titleTemplate,   @title,   titleSize
+            search:  @applyTemplate @searchTemplate,  @search,  searchSize
+            filters: @applyTemplate @filtersTemplate, @filters, filtersSize
+            columns: @applyTemplate @columnsTemplate, @columns
 
         @filters = _.map(@filters, (filter, name) => @createFilter(name, filter))
         filtersDiv = $(".filters", @$el)
