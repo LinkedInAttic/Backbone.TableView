@@ -172,7 +172,7 @@ Backbone.TableView = (function(_super) {
           off: this.firstOf(filter.off, "false"),
           on: this.firstOf(filter.on, "true"),
           filterClass: filter.className || "",
-          init: (filter.set || _.identity)(this.data[name] || filter.init || filter.off || "false"),
+          init: (filter.set || _.identity)(this.firstOf(this.data[name], filter.init, filter.off, "false")),
           setData: this.setData
         });
       case "input":

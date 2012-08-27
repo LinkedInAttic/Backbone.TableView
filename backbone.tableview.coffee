@@ -183,7 +183,7 @@ class Backbone.TableView extends Backbone.View
                     off: @firstOf filter.off, "false"
                     on: @firstOf filter.on, "true"
                     filterClass: filter.className or ""
-                    init: (filter.set or _.identity) @data[name] or filter.init or filter.off or "false"
+                    init: (filter.set or _.identity) (@firstOf @data[name], filter.init, filter.off, "false")
                     setData: @setData
             when "input"
                 return new InputFilter
