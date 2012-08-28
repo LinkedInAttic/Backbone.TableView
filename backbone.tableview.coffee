@@ -59,7 +59,7 @@ class Backbone.TableView extends Backbone.View
         </div>
     """
     paginationTemplate: _.template """
-        <div class="row">
+        <div class="row-fluid">
             <div class="span6">
                 <div class="tableview-info">Showing <%= from %> to <%= to %><%= total %></div>
             </div>
