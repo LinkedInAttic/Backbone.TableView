@@ -272,7 +272,8 @@ class Backbone.TableView extends Backbone.View
 
     # Go to the previous page in the collection
     prevPage: =>
-        @setData "page", @data.page - 1
+        if @data.page > 1
+            @setData "page", @data.page - 1
 
     # Go to the next page in the collection
     nextPage: =>

@@ -291,7 +291,9 @@ Backbone.TableView = (function(_super) {
   };
 
   TableView.prototype.prevPage = function() {
-    return this.setData("page", this.data.page - 1);
+    if (this.data.page > 1) {
+      return this.setData("page", this.data.page - 1);
+    }
   };
 
   TableView.prototype.nextPage = function() {
