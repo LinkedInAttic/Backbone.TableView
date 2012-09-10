@@ -93,9 +93,9 @@ Backbone.TableView = (function(_super) {
 
   TableView.prototype.paginationTemplate = _.template("<div class=\"row-fluid\">\n    <div class=\"span6\">\n        <div class=\"tableview-info\">Showing <%= from %> to <%= to %><%= total %></div>\n    </div>\n    <div class=\"span6\">\n        <div class=\"pagination\">\n            <ul>\n                <li class=\"pager-prev <%= prevDisabled %>\"><a href=\"javascript:void(0)\">← Previous</a></li>\n                <% _.each(pages, function (page) { %>\n                    <li class=\"pager-page <%= page.active %>\"><a href=\"javascript:void(0)\"><%= page.number %></a></li>\n                <% }) %>\n                <li class=\"pager-next <%= nextDisabled %>\"><a href=\"javascript:void(0)\">Next → </a></li>\n            </ul>\n        </div>\n    </div>\n</div>");
 
-  TableView.prototype.dataTemplate = _.template("<% _.each(collection.models, function (row) { %>\n    <tr>\n        <% _.each(columns, function (col, name) { %>\n            <td class=\"<%= col.className || \"\" %> <%= col.tdClass || \"\" %>\">\n                <%= col.draw ? col.draw(row) : row.get(name) || \"\" %>\n            </td>\n        <% }) %>\n    </tr>\n<% }) %>\n<% if (collection.models.length == 0) { %>\n    <tr>\n        <td colspan=\"10\"><%= empty %></td>\n    </tr>\n<% } %>");
+  TableView.prototype.emptyTemplate = _.template("<tr>\n    <td colspan=\"10\"><%= text %></td>\n</tr>");
 
-  TableView.prototype.columnsTemplate = _.template("<% _.each(model, function (col, key) { %>\n    <th abbr=\"<%= key || col %>\"\n     class=\"<%= !col.nosort && \"sorting\" %> <%= ((key || col) == data.sort_col) && \"sorting_\" + data.sort_dir %> <%= col.className || \"\" %>\">\n        <%= col.header || key %>\n    </th>\n<% }) %>");
+  TableView.prototype.columnsTemplate = _.template("<% _.each(model, function (col, key) { %>\n    <th abbr=\"<%= key || col %>\"\n     class=\"<%= !col.nosort ? \"sorting\" : \"\" %> <%= ((key || col) == data.sort_col) ? \"sorting_\" + data.sort_dir : \"\" %> <%= col.className || \"\" %>\">\n        <%= col.header || key %>\n    </th>\n<% }) %>");
 
   TableView.prototype.template = _.template("<div class=\"row-fluid\">\n    <%= title %>\n\n    <%= filters %>\n\n    <%= search %>\n</div>\n\n<table class=\"table table-striped\">\n    <thead>\n        <tr>\n            <%= columns %>\n        </tr>\n    </thead>\n    <tbody class=\"fade\">\n        <tr>\n            <td colspan=\"10\"><%= empty %></td>\n        </tr>\n    </tbody>\n</table>\n\n<div id=\"pagination-main\">\n</div>");
 
@@ -273,11 +273,32 @@ Backbone.TableView = (function(_super) {
   };
 
   TableView.prototype.renderData = function() {
-    $("tbody", this.$el).html(this.dataTemplate({
-      collection: this.collection,
-      columns: this.columns,
-      empty: this.empty || "No records to show"
-    }));
+    var body, col, column, model, name, row, _i, _len, _ref, _ref1;
+    body = $("tbody", this.$el);
+    if (this.collection.models.length === 0) {
+      body.html(this.emptyTemplate({
+        text: this.empty || "No records to show"
+      }));
+    } else {
+      body.html("");
+      _ref = this.collection.models;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        model = _ref[_i];
+        row = $("<tr>");
+        _ref1 = this.columns;
+        for (name in _ref1) {
+          column = _ref1[name];
+          col = $("<td>").addClass(column.className).addClass(column.tdClass);
+          if (column.draw != null) {
+            col.html(column.draw(model));
+          } else {
+            col.html(model.get(name) || "");
+          }
+          row.append(col);
+        }
+        body.append(row);
+      }
+    }
     if (this.pagination) {
       this.refreshPagination();
     }

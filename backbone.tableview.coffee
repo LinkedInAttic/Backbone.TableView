@@ -76,26 +76,15 @@ class Backbone.TableView extends Backbone.View
             </div>
         </div>
     """
-    dataTemplate: _.template """
-        <% _.each(collection.models, function (row) { %>
-            <tr>
-                <% _.each(columns, function (col, name) { %>
-                    <td class="<%= col.className || "" %> <%= col.tdClass || "" %>">
-                        <%= col.draw ? col.draw(row) : row.get(name) || "" %>
-                    </td>
-                <% }) %>
-            </tr>
-        <% }) %>
-        <% if (collection.models.length == 0) { %>
-            <tr>
-                <td colspan="10"><%= empty %></td>
-            </tr>
-        <% } %>
+    emptyTemplate: _.template """
+        <tr>
+            <td colspan="10"><%= text %></td>
+        </tr>
     """
     columnsTemplate: _.template """
         <% _.each(model, function (col, key) { %>
             <th abbr="<%= key || col %>"
-             class="<%= !col.nosort && "sorting" %> <%= ((key || col) == data.sort_col) && "sorting_" + data.sort_dir %> <%= col.className || "" %>">
+             class="<%= !col.nosort ? "sorting" : "" %> <%= ((key || col) == data.sort_col) ? "sorting_" + data.sort_dir : "" %> <%= col.className || "" %>">
                 <%= col.header || key %>
             </th>
         <% }) %>
@@ -256,10 +245,21 @@ class Backbone.TableView extends Backbone.View
 
     # Render the collection in the tbody section of the table
     renderData: =>
-        $("tbody", @$el).html @dataTemplate
-            collection: @collection
-            columns:    @columns
-            empty:      @empty or "No records to show"
+        body = $("tbody", @$el)
+        if @collection.models.length == 0
+            body.html @emptyTemplate text: @empty or "No records to show"
+        else
+            body.html ""
+            for model in @collection.models
+                row = $("<tr>")
+                for name, column of @columns
+                    col = $("<td>").addClass(column.className).addClass(column.tdClass)
+                    if column.draw?
+                        col.html column.draw(model)
+                    else
+                        col.html model.get(name) or ""
+                    row.append col
+                body.append row
         if @pagination
             @refreshPagination()
         @trigger "updated"
