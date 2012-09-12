@@ -215,7 +215,7 @@ class Backbone.TableView extends Backbone.View
         $("tbody", @$el).removeClass("in")
         @trigger "updating"
         @collection.fetch data: @data
-        @updateUrl(replace)
+        @updateUrl replace
 
     # Refresh the pagination div at the bottom
     refreshPagination: =>
@@ -255,7 +255,7 @@ class Backbone.TableView extends Backbone.View
                 for name, column of @columns
                     col = $("<td>").addClass(column.className).addClass(column.tdClass)
                     if column.draw?
-                        col.html column.draw(model)
+                        col.html column.draw(model, @update)
                     else
                         col.html model.get(name) or ""
                     row.append col
