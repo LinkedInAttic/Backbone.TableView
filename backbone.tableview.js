@@ -196,7 +196,7 @@ Backbone.TableView = (function(_super) {
     return this.setData(this.search.query || "q", e.currentTarget.value);
   };
 
-  TableView.prototype.updateUrl = function() {
+  TableView.prototype.updateUrl = function(replace) {
     var first, i, key, separator, uri, val, _ref;
     if (this.router) {
       uri = Backbone.history.fragment;
@@ -215,18 +215,20 @@ Backbone.TableView = (function(_super) {
         }
         uri = uri + separator + key + "=" + val;
       }
-      this.router.navigate(uri);
+      this.router.navigate(uri, {
+        replace: replace
+      });
     }
     return this;
   };
 
-  TableView.prototype.update = function() {
+  TableView.prototype.update = function(replace) {
     $("tbody", this.$el).removeClass("in");
     this.trigger("updating");
     this.collection.fetch({
       data: this.data
     });
-    return this.updateUrl();
+    return this.updateUrl(replace);
   };
 
   TableView.prototype.refreshPagination = function() {
@@ -380,7 +382,7 @@ Backbone.TableView = (function(_super) {
     _.each(filters, function(filter) {
       return filtersDiv.append(filter.render().el);
     });
-    return this.update();
+    return this.update(true);
   };
 
   TableView.prototype.prettyName = function(str) {

@@ -194,7 +194,7 @@ class Backbone.TableView extends Backbone.View
         @setData @search.query or "q", e.currentTarget.value
 
     # Navigate to url with all the parameters in data in the querystring
-    updateUrl: =>
+    updateUrl: (replace) =>
         if @router
             uri = Backbone.history.fragment
             if (i = uri.indexOf "?") > 0
@@ -207,15 +207,15 @@ class Backbone.TableView extends Backbone.View
                 else
                     separator = "&"
                 uri = uri + separator + key + "=" + val
-            @router.navigate uri
+            @router.navigate uri, {replace: replace}
         return @
 
     # Update the collection given all the options/filters
-    update: =>
+    update: (replace) =>
         $("tbody", @$el).removeClass("in")
         @trigger "updating"
         @collection.fetch data: @data
-        @updateUrl()
+        @updateUrl(replace)
 
     # Refresh the pagination div at the bottom
     refreshPagination: =>
@@ -325,7 +325,7 @@ class Backbone.TableView extends Backbone.View
         filters = _.map(@filters, (filter, name) => @createFilter(name, filter))
         filtersDiv = $(".filters", @$el)
         _.each filters, (filter) -> filtersDiv.append filter.render().el
-        @update()
+        @update true
 
     # Helper function to prettify names (eg. hi_world -> Hi World)
     prettyName: (str) ->
