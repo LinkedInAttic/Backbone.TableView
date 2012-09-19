@@ -255,7 +255,7 @@ class Backbone.TableView extends Backbone.View
                 for name, column of @columns
                     col = $("<td>").addClass(column.className).addClass(column.tdClass)
                     if column.draw?
-                        col.html column.draw(model, @update)
+                        col.html column.draw(model, @update, @)
                     else
                         col.html model.get(name) or ""
                     row.append col

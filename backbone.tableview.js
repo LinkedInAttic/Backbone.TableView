@@ -292,7 +292,7 @@ Backbone.TableView = (function(_super) {
           column = _ref1[name];
           col = $("<td>").addClass(column.className).addClass(column.tdClass);
           if (column.draw != null) {
-            col.html(column.draw(model, this.update));
+            col.html(column.draw(model, this.update, this));
           } else {
             col.html(model.get(name) || "");
           }
