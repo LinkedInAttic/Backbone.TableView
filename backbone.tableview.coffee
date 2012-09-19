@@ -64,7 +64,7 @@ class Backbone.TableView extends Backbone.View
                 <div class="tableview-info">Showing <%= from %> to <%= to %><%= total %></div>
             </div>
             <div class="span6">
-                <div class="pagination">
+                <div class="pagination tableview-pagination">
                     <ul>
                         <li class="pager-prev <%= prevDisabled %>"><a href="javascript:void(0)">← Previous</a></li>
                         <% _.each(pages, function (page) { %>
@@ -84,7 +84,7 @@ class Backbone.TableView extends Backbone.View
     columnsTemplate: _.template """
         <% _.each(model, function (col, key) { %>
             <th abbr="<%= key || col %>"
-             class="<%= !col.nosort ? "sorting" : "" %> <%= ((key || col) == data.sort_col) ? "sorting_" + data.sort_dir : "" %> <%= col.className || "" %>">
+             class="<%= !col.nosort ? "tableview-sorting" : "" %> <%= ((key || col) == data.sort_col) ? "tableview-sorting-" + data.sort_dir : "" %> <%= col.className || "" %>">
                 <%= col.header || key %>
             </th>
         <% }) %>
@@ -98,7 +98,7 @@ class Backbone.TableView extends Backbone.View
             <%= search %>
         </div>
 
-        <table class="table table-striped">
+        <table class="table table-striped tableview-table">
             <thead>
                 <tr>
                     <%= columns %>
@@ -284,14 +284,14 @@ class Backbone.TableView extends Backbone.View
         el = e.currentTarget
         cl = el.className
         sort_dir = ""
-        if cl.indexOf("sorting_asc") >= 0
+        if cl.indexOf("tableview-sorting-asc") >= 0
             sort_dir = "desc"
-        else if cl.indexOf("sorting") >= 0
+        else if cl.indexOf("tableview-sorting") >= 0
             sort_dir = "asc"
         else
             return @
-        $("th", @$el).removeClass "sorting_desc sorting_asc"
-        $(el, @$el).addClass "sorting_" + sort_dir
+        $("th", @$el).removeClass "tableview-sorting-desc tableview-sorting-asc"
+        $(el, @$el).addClass "tableview-sorting-" + sort_dir
         @setData "sort_col", el.abbr, "sort_dir", sort_dir
 
     # Apply a template to a model and return the result (string), or empty
@@ -344,7 +344,7 @@ Filters
 
 class Filter extends Backbone.View
     tagName: "div"
-    className: "pull-left filterbox"
+    className: "pull-left tableview-filterbox"
 
     initialize: ->
         @id = @options.id

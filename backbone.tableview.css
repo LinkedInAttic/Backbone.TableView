@@ -2,20 +2,24 @@ div.tableview-info {
     padding-top: 8px;
 }
 
-div.pagination {
+div.tableview-pagination {
     float: right;
     margin: 0;
 }
 
-.table th, .table td {
+.tableview-table {
+    margin-top: 2em;
+}
+
+.tableview-table th, .tableview-table td {
     text-align: center;
 }
 
-.filterbox {
+.tableview-filterbox {
     padding-right: 10px;
 }
 
-.sorting:after {
+.tableview-sorting:after {
     content: "";
     float: right;
     margin-top: 7px;
@@ -25,15 +29,15 @@ div.pagination {
     visibility: hidden;
 }
 
-.sorting:hover:after {
+.tableview-sorting:hover:after {
     visibility: visible;
 }
 
-.sorting_asc:after {
+.tableview-sorting-asc:after {
     visibility: visible;
 }
 
-.sorting_desc:after {
+.tableview-sorting-desc:after {
     border-bottom: none;
     border-left: 4px solid transparent;
     border-right: 4px solid transparent;
