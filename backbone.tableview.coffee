@@ -257,7 +257,7 @@ class Backbone.TableView extends Backbone.View
                     if column.draw?
                         col.html column.draw model, @update, @
                     else
-                        col.html model.get(name) or ""
+                        col.text model.get(name) or ""
                     row.append col
                 body.append row
         if @pagination

@@ -294,7 +294,7 @@ Backbone.TableView = (function(_super) {
           if (column.draw != null) {
             col.html(column.draw(model, this.update, this));
           } else {
-            col.html(model.get(name) || "");
+            col.text(model.get(name) || "");
           }
           row.append(col);
         }
