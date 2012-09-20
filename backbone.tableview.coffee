@@ -222,7 +222,7 @@ class Backbone.TableView extends Backbone.View
         from = (@data.page - 1) * @data.size
         to   = from + @collection.size()
         if @collection.size() > 0 then from++
-        max  = if @collection.count? then @collection.count() else -1
+        max  = if @collection.count? then _.result(@collection, "count") else -1
         if max < 0
             maxPage  = 1
             pageFrom = @data.page

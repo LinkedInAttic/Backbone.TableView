@@ -238,7 +238,7 @@ Backbone.TableView = (function(_super) {
     if (this.collection.size() > 0) {
       from++;
     }
-    max = this.collection.count != null ? this.collection.count() : -1;
+    max = this.collection.count != null ? _.result(this.collection, "count") : -1;
     if (max < 0) {
       maxPage = 1;
       pageFrom = this.data.page;
