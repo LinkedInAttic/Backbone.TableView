@@ -222,7 +222,7 @@ Backbone.TableView = (function(_super) {
   };
 
   TableView.prototype.update = function(replace, skipFetch) {
-    $("tbody", this.$el).removeClass("in");
+    this.$("tbody").removeClass("in");
     this.trigger("updating");
     this.updateUrl(replace);
     if (!skipFetch) {
@@ -267,7 +267,7 @@ Backbone.TableView = (function(_super) {
       }
       return _results;
     }).call(this);
-    $("#pagination-main", this.$el).html(this.paginationTemplate({
+    this.$("#pagination-main").html(this.paginationTemplate({
       from: from,
       to: to,
       total: total,
@@ -280,7 +280,7 @@ Backbone.TableView = (function(_super) {
 
   TableView.prototype.renderData = function() {
     var body, col, column, model, name, row, _i, _len, _ref, _ref1;
-    body = $("tbody", this.$el);
+    body = this.$("tbody");
     if (this.collection.models.length === 0) {
       body.html(this.emptyTemplate({
         text: this.empty || "No records to show"
@@ -309,7 +309,7 @@ Backbone.TableView = (function(_super) {
       this.refreshPagination();
     }
     this.trigger("updated");
-    $("tbody", this.$el).addClass("in");
+    body.addClass("in");
     return this;
   };
 
@@ -339,8 +339,8 @@ Backbone.TableView = (function(_super) {
     } else {
       return this;
     }
-    $("th", this.$el).removeClass("tableview-sorting-desc tableview-sorting-asc");
-    $(el, this.$el).addClass("tableview-sorting-" + sort_dir);
+    this.$("th").removeClass("tableview-sorting-desc tableview-sorting-asc");
+    this.$(el).addClass("tableview-sorting-" + sort_dir);
     return this.setData("sort_col", el.abbr, "sort_dir", sort_dir);
   };
 
@@ -382,7 +382,7 @@ Backbone.TableView = (function(_super) {
     filters = _.map(this.filters, function(filter, name) {
       return _this.createFilter(name, filter);
     });
-    filtersDiv = $(".filters", this.$el);
+    filtersDiv = this.$(".filters");
     _.each(filters, function(filter) {
       return filtersDiv.append(filter.render().el);
     });
@@ -484,7 +484,7 @@ ButtonFilter = (function(_super) {
   };
 
   ButtonFilter.prototype.update = function(e) {
-    $(e.currentTarget, this.$el).toggleClass("active");
+    this.$(e.currentTarget).toggleClass("active");
     this.current = 1 - this.current;
     return this.setData(this.id, this.values[this.current]);
   };
@@ -533,8 +533,8 @@ ButtonOptionFilter = (function(_super) {
   };
 
   ButtonOptionFilter.prototype.update = function(e) {
-    $(".btn", this.$el).removeClass("active");
-    $(e.currentTarget, this.$el).addClass("active");
+    this.$(".btn").removeClass("active");
+    this.$(e.currentTarget).addClass("active");
     return this.setData(this.id, e.currentTarget.value);
   };
 

@@ -212,7 +212,7 @@ class Backbone.TableView extends Backbone.View
 
     # Update the collection given all the options/filters
     update: (replace, skipFetch) =>
-        $("tbody", @$el).removeClass("in")
+        @$("tbody").removeClass("in")
         @trigger "updating"
         @updateUrl replace
         if not skipFetch
@@ -238,7 +238,7 @@ class Backbone.TableView extends Backbone.View
             pageTo   = _.min [maxPage, @data.page + 2 + _.max [0, 3 - @data.page]]
             total    = " of " + max + " entries"
         pages = ({number: i, active: (i == @data.page and "active") or ""} for i in _.range pageFrom, pageTo + 1)
-        $("#pagination-main", @$el).html @paginationTemplate
+        @$("#pagination-main").html @paginationTemplate
             from: from
             to: to
             total: total
@@ -249,7 +249,7 @@ class Backbone.TableView extends Backbone.View
 
     # Render the collection in the tbody section of the table
     renderData: =>
-        body = $("tbody", @$el)
+        body = @$("tbody")
         if @collection.models.length == 0
             body.html @emptyTemplate text: @empty or "No records to show"
         else
@@ -267,7 +267,7 @@ class Backbone.TableView extends Backbone.View
         if @pagination
             @refreshPagination()
         @trigger "updated"
-        $("tbody", @$el).addClass("in")
+        body.addClass("in")
         return @
 
     # Go to a requested page
@@ -294,8 +294,8 @@ class Backbone.TableView extends Backbone.View
             sort_dir = "asc"
         else
             return @
-        $("th", @$el).removeClass "tableview-sorting-desc tableview-sorting-asc"
-        $(el, @$el).addClass "tableview-sorting-" + sort_dir
+        @$("th").removeClass "tableview-sorting-desc tableview-sorting-asc"
+        @$(el).addClass "tableview-sorting-" + sort_dir
         @setData "sort_col", el.abbr, "sort_dir", sort_dir
 
     # Apply a template to a model and return the result (string), or empty
@@ -327,7 +327,7 @@ class Backbone.TableView extends Backbone.View
             columns: @applyTemplate @columnsTemplate, @columns
 
         filters = _.map(@filters, (filter, name) => @createFilter(name, filter))
-        filtersDiv = $(".filters", @$el)
+        filtersDiv = @$(".filters")
         _.each filters, (filter) -> filtersDiv.append filter.render().el
         @update true, @skipInitialFetch
 
@@ -380,7 +380,7 @@ class ButtonFilter extends Filter
         @current = if @options.init == @options.off then 0 else 1
 
     update: (e) =>
-        $(e.currentTarget, @$el).toggleClass "active"
+        @$(e.currentTarget).toggleClass "active"
         @current = 1 - @current
         @setData @id, @values[@current]
 
@@ -410,6 +410,6 @@ class ButtonOptionFilter extends Filter
                 {name: name, value: value}
 
     update: (e) =>
-        $(".btn", @$el).removeClass "active"
-        $(e.currentTarget, @$el).addClass "active"
+        @$(".btn").removeClass "active"
+        @$(e.currentTarget).addClass "active"
         @setData @id, e.currentTarget.value
