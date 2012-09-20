@@ -89,7 +89,7 @@ Backbone.TableView = (function(_super) {
 
   TableView.prototype.filtersTemplate = _.template("<div class=\"filters controls pagination-centered <%= classSize %>\">\n</div>");
 
-  TableView.prototype.searchTemplate = _.template("<div class=\"<%= classSize %>\">\n    <input type=\"text\" class=\"search-query input-block-level pull-right\" placeholder=\"<%= model.detail || model %>\" value=\"<%= _.escape(data[model.query || \"q\"] || \"\") %>\"></input>\n</div>");
+  TableView.prototype.searchTemplate = _.template("<div class=\"<%= classSize %>\">\n    <input type=\"text\" class=\"search-query input-block-level pull-right\" placeholder=\"<%= model.detail || model %>\" value=\"<%- data[model.query || \"q\"] || \"\" %>\"></input>\n</div>");
 
   TableView.prototype.paginationTemplate = _.template("<div class=\"row-fluid\">\n    <div class=\"span6\">\n        <div class=\"tableview-info\">Showing <%= from %> to <%= to %><%= total %></div>\n    </div>\n    <div class=\"span6\">\n        <div class=\"pagination tableview-pagination\">\n            <ul>\n                <li class=\"pager-prev <%= prevDisabled %>\"><a href=\"javascript:void(0)\">← Previous</a></li>\n                <% _.each(pages, function (page) { %>\n                    <li class=\"pager-page <%= page.active %>\"><a href=\"javascript:void(0)\"><%= page.number %></a></li>\n                <% }) %>\n                <li class=\"pager-next <%= nextDisabled %>\"><a href=\"javascript:void(0)\">Next → </a></li>\n            </ul>\n        </div>\n    </div>\n</div>");
 
@@ -222,13 +222,18 @@ Backbone.TableView = (function(_super) {
     return this;
   };
 
-  TableView.prototype.update = function(replace) {
+  TableView.prototype.update = function(replace, skipFetch) {
     $("tbody", this.$el).removeClass("in");
     this.trigger("updating");
-    this.collection.fetch({
-      data: this.data
-    });
-    return this.updateUrl(replace);
+    this.updateUrl(replace);
+    if (!skipFetch) {
+      this.collection.fetch({
+        data: this.data
+      });
+    } else {
+      this.renderData();
+    }
+    return this;
   };
 
   TableView.prototype.refreshPagination = function() {
@@ -382,7 +387,7 @@ Backbone.TableView = (function(_super) {
     _.each(filters, function(filter) {
       return filtersDiv.append(filter.render().el);
     });
-    return this.update(true);
+    return this.update(true, this.skipInitialFetch);
   };
 
   TableView.prototype.prettyName = function(str) {

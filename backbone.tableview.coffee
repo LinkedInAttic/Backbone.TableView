@@ -207,15 +207,19 @@ class Backbone.TableView extends Backbone.View
                 else
                     separator = "&"
                 uri = uri + separator + key + "=" + val
-            @router.navigate uri, {replace: replace}
+            @router.navigate uri, replace: replace
         return @
 
     # Update the collection given all the options/filters
-    update: (replace) =>
+    update: (replace, skipFetch) =>
         $("tbody", @$el).removeClass("in")
         @trigger "updating"
-        @collection.fetch data: @data
         @updateUrl replace
+        if not skipFetch
+            @collection.fetch data: @data
+        else
+            @renderData()
+        return @
 
     # Refresh the pagination div at the bottom
     refreshPagination: =>
@@ -325,7 +329,7 @@ class Backbone.TableView extends Backbone.View
         filters = _.map(@filters, (filter, name) => @createFilter(name, filter))
         filtersDiv = $(".filters", @$el)
         _.each filters, (filter) -> filtersDiv.append filter.render().el
-        @update true
+        @update true, @skipInitialFetch
 
     # Helper function to prettify names (eg. hi_world -> Hi World)
     prettyName: (str) ->
