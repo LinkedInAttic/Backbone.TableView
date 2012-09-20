@@ -392,15 +392,11 @@ Backbone.TableView = (function(_super) {
   };
 
   TableView.prototype.firstOf = function() {
-    var arg, args, index;
+    var args;
     args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-    for (index in args) {
-      arg = args[index];
-      if (arg != null) {
-        return arg;
-      }
-    }
-    return null;
+    return _.find(args, function(a) {
+      return a != null;
+    });
   };
 
   return TableView;

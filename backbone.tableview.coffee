@@ -333,9 +333,7 @@ class Backbone.TableView extends Backbone.View
 
     # Helper function that returns the first non-null argument
     firstOf: (args...) =>
-        for index, arg of args
-            if arg? then return arg
-        return null
+        _.find args, (a) -> a?
 
 ###
 Filters
