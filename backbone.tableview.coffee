@@ -55,7 +55,7 @@ class Backbone.TableView extends Backbone.View
     """
     searchTemplate: _.template """
         <div class="<%= classSize %>">
-            <input type="text" class="search-query input-block-level pull-right" placeholder="<%= model.detail || model %>" value="<%= data[model.query || "q"] || "" %>"></input>
+            <input type="text" class="search-query input-block-level pull-right" placeholder="<%= model.detail || model %>" value="<%= _.escape(data[model.query || "q"] || "") %>"></input>
         </div>
     """
     paginationTemplate: _.template """
@@ -255,7 +255,7 @@ class Backbone.TableView extends Backbone.View
                 for name, column of @columns
                     col = $("<td>").addClass(column.className).addClass(column.tdClass)
                     if column.draw?
-                        col.html column.draw(model, @update, @)
+                        col.html column.draw model, @update, @
                     else
                         col.html model.get(name) or ""
                     row.append col
