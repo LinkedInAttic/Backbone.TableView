@@ -55,8 +55,6 @@ Backbone.TableView = (function(_super) {
   __extends(TableView, _super);
 
   function TableView() {
-    this.firstOf = __bind(this.firstOf, this);
-
     this.render = __bind(this.render, this);
 
     this.toggleSort = __bind(this.toggleSort, this);
@@ -155,40 +153,41 @@ Backbone.TableView = (function(_super) {
   };
 
   TableView.prototype.createFilter = function(name, filter) {
+    var _ref, _ref1, _ref10, _ref11, _ref12, _ref13, _ref14, _ref15, _ref16, _ref17, _ref18, _ref19, _ref2, _ref20, _ref21, _ref22, _ref23, _ref24, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
     switch (filter.type) {
       case "option":
         return new ButtonOptionFilter({
           id: name,
-          name: filter.name || this.prettyName(name),
-          filterClass: filter.className || "",
+          name: (_ref = filter.name) != null ? _ref : this.prettyName(name),
+          filterClass: (_ref1 = filter.className) != null ? _ref1 : "",
           options: filter.options,
-          init: (filter.set || _.identity)(this.data[name] || filter.init || ""),
+          init: ((_ref4 = filter.set) != null ? _ref4 : _.identity)((_ref2 = (_ref3 = this.data[name]) != null ? _ref3 : filter.init) != null ? _ref2 : ""),
           setData: this.setData
         });
       case "button":
         return new ButtonFilter({
           id: name,
-          name: filter.name || this.prettyName(name),
-          off: this.firstOf(filter.off, "false"),
-          on: this.firstOf(filter.on, "true"),
-          filterClass: filter.className || "",
-          init: (filter.set || _.identity)(this.firstOf(this.data[name], filter.init, filter.off, "false")),
+          name: (_ref5 = filter.name) != null ? _ref5 : this.prettyName(name),
+          off: (_ref6 = filter.off) != null ? _ref6 : "false",
+          on: (_ref7 = filter.on) != null ? _ref7 : "true",
+          filterClass: (_ref8 = filter.className) != null ? _ref8 : "",
+          init: ((_ref12 = filter.set) != null ? _ref12 : _.identity)((_ref9 = (_ref10 = (_ref11 = this.data[name]) != null ? _ref11 : filter.init) != null ? _ref10 : filter.off) != null ? _ref9 : "false"),
           setData: this.setData
         });
       case "input":
         return new InputFilter({
           id: name,
-          name: filter.name || this.prettyName(name),
+          name: (_ref13 = filter.name) != null ? _ref13 : this.prettyName(name),
           extraId: filter.extraId,
-          filterClass: filter.className || "",
-          get: filter.get || _.identity,
-          getExtraId: filter.getExtraId || _.identity,
-          init: (filter.set || _.identity)(this.data[name] || filter.init || "", this.data[filter.extraId] || filter.extraInit || ""),
+          filterClass: (_ref14 = filter.className) != null ? _ref14 : "",
+          get: (_ref15 = filter.get) != null ? _ref15 : _.identity,
+          getExtraId: (_ref16 = filter.getExtraId) != null ? _ref16 : _.identity,
+          init: ((_ref21 = filter.set) != null ? _ref21 : _.identity)((_ref17 = (_ref18 = this.data[name]) != null ? _ref18 : filter.init) != null ? _ref17 : "", (_ref19 = (_ref20 = this.data[filter.extraId]) != null ? _ref20 : filter.extraInit) != null ? _ref19 : ""),
           setData: this.setData
         });
     }
     filter.setData = this.setData;
-    filter.init = (filter.set || _.identity)(this.data[name] || filter.init || "");
+    filter.init = ((_ref24 = filter.set) != null ? _ref24 : _.identity)((_ref22 = (_ref23 = this.data[name]) != null ? _ref23 : filter.init) != null ? _ref22 : "");
     return filter;
   };
 
@@ -393,14 +392,6 @@ Backbone.TableView = (function(_super) {
   TableView.prototype.prettyName = function(str) {
     return str.charAt(0).toUpperCase() + str.substring(1).replace(/_(\w)/g, function(match, p1) {
       return " " + p1.toUpperCase();
-    });
-  };
-
-  TableView.prototype.firstOf = function() {
-    var args;
-    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-    return _.find(args, function(a) {
-      return a != null;
     });
   };
 

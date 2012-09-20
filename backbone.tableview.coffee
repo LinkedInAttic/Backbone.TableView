@@ -160,33 +160,33 @@ class Backbone.TableView extends Backbone.View
             when "option"
                 return new ButtonOptionFilter
                     id: name
-                    name: filter.name or @prettyName name
-                    filterClass: filter.className or ""
+                    name: filter.name ? @prettyName name
+                    filterClass: filter.className ? ""
                     options: filter.options
-                    init: (filter.set or _.identity) @data[name] or filter.init or ""
+                    init: (filter.set ? _.identity) @data[name] ? filter.init ? ""
                     setData: @setData
             when "button"
                 return new ButtonFilter
                     id: name
-                    name: filter.name or @prettyName name
-                    off: @firstOf filter.off, "false"
-                    on: @firstOf filter.on, "true"
-                    filterClass: filter.className or ""
-                    init: (filter.set or _.identity) (@firstOf @data[name], filter.init, filter.off, "false")
+                    name: filter.name ? @prettyName name
+                    off: filter.off ? "false"
+                    on: filter.on ? "true"
+                    filterClass: filter.className ? ""
+                    init: (filter.set ? _.identity) @data[name] ? filter.init ? filter.off ? "false"
                     setData: @setData
             when "input"
                 return new InputFilter
                     id: name
-                    name: filter.name or @prettyName name
+                    name: filter.name ? @prettyName name
                     extraId: filter.extraId
-                    filterClass: filter.className or ""
-                    get: filter.get or _.identity
-                    getExtraId: filter.getExtraId or _.identity
-                    init: (filter.set or _.identity) @data[name] or filter.init or "", @data[filter.extraId] or filter.extraInit or ""
+                    filterClass: filter.className ? ""
+                    get: filter.get ? _.identity
+                    getExtraId: filter.getExtraId ? _.identity
+                    init: (filter.set ? _.identity) @data[name] ? filter.init ? "", @data[filter.extraId] ? filter.extraInit ? ""
                     setData: @setData
         # For custom filters, we just provide the setData function
         filter.setData = @setData
-        filter.init = (filter.set or _.identity) @data[name] or filter.init or ""
+        filter.init = (filter.set ? _.identity) @data[name] ? filter.init ? ""
         return filter
 
     # Update collection with search query
@@ -334,10 +334,6 @@ class Backbone.TableView extends Backbone.View
     # Helper function to prettify names (eg. hi_world -> Hi World)
     prettyName: (str) ->
         str.charAt(0).toUpperCase() + str.substring(1).replace(/_(\w)/g, (match, p1) -> " " + p1.toUpperCase())
-
-    # Helper function that returns the first non-null argument
-    firstOf: (args...) =>
-        _.find args, (a) -> a?
 
 ###
 Filters
