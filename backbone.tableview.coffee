@@ -10,6 +10,7 @@ Optionally it supports pagination, search, and any number of filters
 
     class UserTableView extends Backbone.TableView
         title: "My Users Table"
+        collection: new Users()
         columns:
             name:
                 header: "My Name"
