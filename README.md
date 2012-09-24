@@ -19,24 +19,13 @@ of filters (see supported filters below):
             last_login:
                 header: "Last Login Time"
                 draw: (model) ->
-                    new Date(model.get 'time')
-            description:
-                header: "Description"
-                nosort: true
-                draw: (model) ->
-                    some_weird_formatting_function(model.get('some_text'))
+                    new Date(model.get "time")
         pagination: true
         search:
             query: "name"
             detail: "Search by Name"
         filters:
             from:
-                type: "input"
-                className: "date"
-                init: new Date()
-                get: (val) ->
-                    ... process the date val ...
-            to:
                 type: "input"
                 className: "date"
                 init: new Date()
@@ -52,17 +41,8 @@ Use it as any other Backbone View, either setting the "el" property at
 creation, or letting backbone create if for you, eg (Users is a regular
 backbone collection):
 
-    user_table = new UserTableView collection: new Users(), el: "#myusertable"
-    user_table.render()
-
-or
-
     user_table = new UserTableView collection: new Users()
     $("#somewhere").html user_table.render().el
-
-### Filters
-
-Supported filters are "input", "button" and "options".
 
 ## License
 
