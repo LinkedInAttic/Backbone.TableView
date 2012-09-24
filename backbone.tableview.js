@@ -199,7 +199,7 @@ Backbone.TableView = (function(_super) {
     var first, i, key, separator, uri, val, _ref;
     if (this.router) {
       uri = Backbone.history.fragment;
-      if ((i = uri.indexOf("?")) > 0) {
+      if ((i = uri.indexOf("?")) >= 0) {
         uri = uri.substring(0, i);
       }
       first = true;
