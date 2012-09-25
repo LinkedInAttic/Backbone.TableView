@@ -115,7 +115,10 @@ Backbone.TableView = (function(_super) {
         this[key] = val;
       }
     }
-    this.data = $.extend({}, this.initialData, this.parseQueryString(Backbone.history.fragment));
+    this.data = _.extend({}, this.initialData);
+    if (this.router) {
+      this.data = _.extend(this.data, this.parseQueryString(Backbone.history.fragment));
+    }
     this.data.page = parseInt(this.data.page) || this.page || 1;
     this.data.size = parseInt(this.data.size) || this.size || 10;
     return this;
