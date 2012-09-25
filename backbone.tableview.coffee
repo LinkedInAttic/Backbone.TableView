@@ -213,7 +213,9 @@ class Backbone.TableView extends Backbone.View
         @trigger "updating"
         @updateUrl replace
         if not skipFetch
-            @collection.fetch data: @data
+            if @filterData?
+                data = @filterData(_.clone(@data))
+            @collection.fetch data: data or @data
         else
             @renderData()
         return @
