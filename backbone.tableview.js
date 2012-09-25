@@ -21,11 +21,6 @@ Optionally it supports pagination, search, and any number of filters
                 header: "Last Login Time"
                 draw: (model) ->
                     new Date(model.get 'time')
-            description:
-                header: "Description"
-                nosort: true
-                draw: (model) ->
-                    some_weird_formatting_function(model.get('some_text'))
         pagination: true
         search:
             query: "name"
@@ -37,7 +32,7 @@ Optionally it supports pagination, search, and any number of filters
                 init: new Date()
                 get: (val) ->
                     ... process the date val ...
-            my_btn:
+            my_button:
                 type: "button"
             status:
                 type: "option"
