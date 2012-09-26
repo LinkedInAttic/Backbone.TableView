@@ -220,16 +220,12 @@ Backbone.TableView = (function(_super) {
   };
 
   TableView.prototype.update = function(replace, skipFetch) {
-    var data;
     this.$("tbody").removeClass("in");
     this.trigger("updating");
     this.updateUrl(replace);
     if (!skipFetch) {
-      if (this.filterData != null) {
-        data = this.filterData(_.clone(this.data));
-      }
       this.collection.fetch({
-        data: data || this.data
+        data: (typeof this.filterData === "function" ? this.filterData(_.clone(this.data)) : void 0) || this.data
       });
     } else {
       this.renderData();
