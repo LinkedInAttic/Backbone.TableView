@@ -100,9 +100,6 @@ class Backbone.TableView extends Backbone.View
                 </tr>
             </thead>
             <tbody class="fade">
-                <tr>
-                    <td colspan="10"><%= empty %></td>
-                </tr>
             </tbody>
         </table>
 
