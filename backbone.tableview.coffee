@@ -121,8 +121,9 @@ class Backbone.TableView extends Backbone.View
         @data = _.extend({}, @initialData)
         if @router
             @data = _.extend(@data, @parseQueryString Backbone.history.fragment)
-        @data.page = parseInt(@data.page) or @page or 1
-        @data.size = parseInt(@data.size) or @size or 10
+        if @pagination
+            @data.page = parseInt(@data.page) or @page or 1
+            @data.size = parseInt(@data.size) or @size or 10
         return @
 
     # Return a parsed querystring with the "?" (eg. query = "/users?hi=1&bye=hello"
@@ -139,7 +140,8 @@ class Backbone.TableView extends Backbone.View
 
     # Set data and update collection
     setData: (args...) =>
-        @data.page = 1
+        if @pagination
+            @data.page = 1
         while args.length > 1
             [key, val, args...] = args
             if val? and (val == false or val == 0 or val)

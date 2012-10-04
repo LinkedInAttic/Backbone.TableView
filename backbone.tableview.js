@@ -114,8 +114,10 @@ Backbone.TableView = (function(_super) {
     if (this.router) {
       this.data = _.extend(this.data, this.parseQueryString(Backbone.history.fragment));
     }
-    this.data.page = parseInt(this.data.page) || this.page || 1;
-    this.data.size = parseInt(this.data.size) || this.size || 10;
+    if (this.pagination) {
+      this.data.page = parseInt(this.data.page) || this.page || 1;
+      this.data.size = parseInt(this.data.size) || this.size || 10;
+    }
     return this;
   };
 
@@ -138,7 +140,9 @@ Backbone.TableView = (function(_super) {
   TableView.prototype.setData = function() {
     var args, key, val, _ref;
     args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-    this.data.page = 1;
+    if (this.pagination) {
+      this.data.page = 1;
+    }
     while (args.length > 1) {
       _ref = args, key = _ref[0], val = _ref[1], args = 3 <= _ref.length ? __slice.call(_ref, 2) : [];
       if ((val != null) && (val === false || val === 0 || val)) {
