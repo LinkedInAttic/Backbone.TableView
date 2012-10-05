@@ -209,7 +209,7 @@ Backbone.TableView = (function(_super) {
         } else {
           separator = "&";
         }
-        uri = uri + separator + key + "=" + val;
+        uri = uri + separator + encodeURIComponent(key) + "=" + encodeURIComponent(val);
       }
       this.router.navigate(uri, {
         replace: replace

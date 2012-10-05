@@ -197,7 +197,7 @@ class Backbone.TableView extends Backbone.View
                     separator = "?"
                 else
                     separator = "&"
-                uri = uri + separator + key + "=" + val
+                uri = uri + separator + encodeURIComponent(key) + "=" + encodeURIComponent(val)
             @router.navigate uri, replace: replace
         return @
 
