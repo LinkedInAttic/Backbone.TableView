@@ -360,7 +360,7 @@ class InputFilter extends Filter
     template: _.template """
         <span class="add-on"><%= name %></span><input type="text" class="filter <%= filterClass %>" value="<%= init %>"></input>
     """
-    className: "input-prepend pull-left filterbox"
+    className: "input-prepend pull-left tableview-filterbox"
     events:
         "change .filter": "update"
 
@@ -393,7 +393,7 @@ class ButtonOptionFilter extends Filter
             <button class="btn <%= init == el.value ? "active" : "" %>" value="<%= el.value %>"><%= el.name %></button>
         <% }) %>
     """
-    className: "btn-group pull-left filterbox"
+    className: "btn-group pull-left tableview-filterbox"
     events:
         "click .btn": "update"
 

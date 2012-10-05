@@ -459,7 +459,7 @@ InputFilter = (function(_super) {
 
   InputFilter.prototype.template = _.template("<span class=\"add-on\"><%= name %></span><input type=\"text\" class=\"filter <%= filterClass %>\" value=\"<%= init %>\"></input>");
 
-  InputFilter.prototype.className = "input-prepend pull-left filterbox";
+  InputFilter.prototype.className = "input-prepend pull-left tableview-filterbox";
 
   InputFilter.prototype.events = {
     "change .filter": "update"
@@ -519,7 +519,7 @@ ButtonOptionFilter = (function(_super) {
 
   ButtonOptionFilter.prototype.template = _.template("<% _.each(options, function (el, i) { %>\n    <button class=\"btn <%= init == el.value ? \"active\" : \"\" %>\" value=\"<%= el.value %>\"><%= el.name %></button>\n<% }) %>");
 
-  ButtonOptionFilter.prototype.className = "btn-group pull-left filterbox";
+  ButtonOptionFilter.prototype.className = "btn-group pull-left tableview-filterbox";
 
   ButtonOptionFilter.prototype.events = {
     "click .btn": "update"
