@@ -180,10 +180,11 @@ class Backbone.TableView extends Backbone.View
                     getExtraId: filter.getExtraId ? _.identity
                     init: (filter.set ? _.identity) @data[name] ? filter.init ? "", @data[filter.extraId] ? filter.extraInit ? ""
                     setData: @setData
-        # For custom filters, we just provide the setData function
-        filter.setData = @setData
-        filter.init = (filter.set ? _.identity) @data[name] ? filter.init ? ""
-        return filter
+            when "custom"
+                # For custom filters, we just provide the setData function
+                filter.setData = @setData
+                filter.init = (filter.set ? _.identity) @data[name] ? filter.init ? ""
+                return filter
 
     # Update collection with search query
     updateSearch: (e) =>
@@ -322,7 +323,7 @@ class Backbone.TableView extends Backbone.View
             filters: @applyTemplate @filtersTemplate, @filters, filtersSize
             columns: @applyTemplate @columnsTemplate, @columns
 
-        filters = _.map(@filters, (filter, name) => @createFilter(name, filter))
+        filters = _.compact _.map @filters, (filter, name) => @createFilter(name, filter)
         filtersDiv = @$(".filters")
         _.each filters, (filter) -> filtersDiv.append filter.render().el
         @update true, @skipInitialFetch

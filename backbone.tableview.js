@@ -187,10 +187,11 @@ Backbone.TableView = (function(_super) {
           init: ((_ref21 = filter.set) != null ? _ref21 : _.identity)((_ref17 = (_ref18 = this.data[name]) != null ? _ref18 : filter.init) != null ? _ref17 : "", (_ref19 = (_ref20 = this.data[filter.extraId]) != null ? _ref20 : filter.extraInit) != null ? _ref19 : ""),
           setData: this.setData
         });
+      case "custom":
+        filter.setData = this.setData;
+        filter.init = ((_ref24 = filter.set) != null ? _ref24 : _.identity)((_ref22 = (_ref23 = this.data[name]) != null ? _ref23 : filter.init) != null ? _ref22 : "");
+        return filter;
     }
-    filter.setData = this.setData;
-    filter.init = ((_ref24 = filter.set) != null ? _ref24 : _.identity)((_ref22 = (_ref23 = this.data[name]) != null ? _ref23 : filter.init) != null ? _ref22 : "");
-    return filter;
   };
 
   TableView.prototype.updateSearch = function(e) {
@@ -381,9 +382,9 @@ Backbone.TableView = (function(_super) {
       filters: this.applyTemplate(this.filtersTemplate, this.filters, filtersSize),
       columns: this.applyTemplate(this.columnsTemplate, this.columns)
     }));
-    filters = _.map(this.filters, function(filter, name) {
+    filters = _.compact(_.map(this.filters, function(filter, name) {
       return _this.createFilter(name, filter);
-    });
+    }));
     filtersDiv = this.$(".filters");
     _.each(filters, function(filter) {
       return filtersDiv.append(filter.render().el);
