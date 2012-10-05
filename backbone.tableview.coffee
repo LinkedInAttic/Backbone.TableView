@@ -404,7 +404,7 @@ class ButtonOptionFilter extends Filter
 
 class DropdownFilter extends Filter
     template: _.template """
-        <select class="filter">
+        <select class="filter <%= filterClass %>">
             <% _.each(options, function (el, i) { %>
                 <option <%= init == el.value ? "selected='selected'" : "" %> value="<%= el.value %>"><%= el.name %></button>
             <% }) %>

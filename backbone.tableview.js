@@ -544,7 +544,7 @@ DropdownFilter = (function(_super) {
     return DropdownFilter.__super__.constructor.apply(this, arguments);
   }
 
-  DropdownFilter.prototype.template = _.template("<select class=\"filter\">\n    <% _.each(options, function (el, i) { %>\n        <option <%= init == el.value ? \"selected='selected'\" : \"\" %> value=\"<%= el.value %>\"><%= el.name %></button>\n    <% }) %>\n</select>");
+  DropdownFilter.prototype.template = _.template("<select class=\"filter <%= filterClass %>\">\n    <% _.each(options, function (el, i) { %>\n        <option <%= init == el.value ? \"selected='selected'\" : \"\" %> value=\"<%= el.value %>\"><%= el.name %></button>\n    <% }) %>\n</select>");
 
   DropdownFilter.prototype.events = {
     "change .filter": "update"
