@@ -422,9 +422,27 @@ Filter = (function(_super) {
   Filter.prototype.className = "pull-left tableview-filterbox";
 
   Filter.prototype.initialize = function() {
+    var _this = this;
     this.id = this.options.id;
     this.extraId = this.options.extraId;
-    return this.setData = this.options.setData;
+    this.setData = this.options.setData;
+    return this.options.options = _.map(_.result(this.options, "options"), function(option) {
+      var name, value;
+      value = option;
+      if (_.isArray(value)) {
+        name = value[0];
+        value = value[1];
+      } else if (_.isObject(value)) {
+        name = option.name;
+        value = option.value;
+      } else {
+        name = option;
+      }
+      return {
+        name: name,
+        value: value
+      };
+    });
   };
 
   Filter.prototype.render = function() {
@@ -511,28 +529,6 @@ ButtonOptionFilter = (function(_super) {
 
   ButtonOptionFilter.prototype.events = {
     "click .btn": "update"
-  };
-
-  ButtonOptionFilter.prototype.initialize = function() {
-    var _this = this;
-    ButtonOptionFilter.__super__.initialize.apply(this, arguments);
-    return this.options.options = _.map(this.options.options, function(option) {
-      var name, value;
-      value = option;
-      if (_.isArray(value)) {
-        name = value[0];
-        value = value[1];
-      } else if (_.isObject(value)) {
-        name = option.name;
-        value = option.value;
-      } else {
-        name = option;
-      }
-      return {
-        name: name,
-        value: value
-      };
-    });
   };
 
   ButtonOptionFilter.prototype.update = function(e) {

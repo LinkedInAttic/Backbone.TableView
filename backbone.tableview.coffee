@@ -345,6 +345,18 @@ class Filter extends Backbone.View
         @id = @options.id
         @extraId = @options.extraId
         @setData = @options.setData
+        @options.options = _.map _.result(@options, "options"),
+            (option) =>
+                value = option
+                if _.isArray value
+                    name = value[0]
+                    value = value[1]
+                else if _.isObject value
+                    name = option.name
+                    value = option.value
+                else
+                    name = option
+                {name: name, value: value}
 
     render: =>
         @$el.html @template @options
@@ -390,21 +402,6 @@ class ButtonOptionFilter extends Filter
     className: "btn-group pull-left filterbox"
     events:
         "click .btn": "update"
-
-    initialize: ->
-        super
-        @options.options = _.map @options.options,
-            (option) =>
-                value = option
-                if _.isArray value
-                    name = value[0]
-                    value = value[1]
-                else if _.isObject value
-                    name = option.name
-                    value = option.value
-                else
-                    name = option
-                {name: name, value: value}
 
     update: (e) =>
         @$(".btn").removeClass "active"
