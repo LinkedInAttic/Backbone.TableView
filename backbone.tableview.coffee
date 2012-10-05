@@ -152,42 +152,28 @@ class Backbone.TableView extends Backbone.View
 
     # Creates a filter from a filter config definition
     createFilter: (name, filter) =>
+        options =
+            id: name
+            extraId: filter.extraId
+            name: filter.name ? @prettyName name
+            off: filter.off ? "false"
+            on: filter.on ? "true"
+            filterClass: filter.className ? ""
+            options: filter.options
+            init: (filter.set ? _.identity) @data[name] ? filter.init ? "", @data[filter.extraId] ? filter.extraInit ? ""
+            setData: @setData
+            get: filter.get ? _.identity
+            getExtraId: filter.getExtraId ? _.identity
         switch filter.type
             when "option"
-                return new ButtonOptionFilter
-                    id: name
-                    name: filter.name ? @prettyName name
-                    filterClass: filter.className ? ""
-                    options: filter.options
-                    init: (filter.set ? _.identity) @data[name] ? filter.init ? ""
-                    setData: @setData
+                return new ButtonOptionFilter options
             when "dropdown"
-                return new DropdownFilter
-                    id: name
-                    name: filter.name ? @prettyName name
-                    filterClass: filter.className ? ""
-                    options: filter.options
-                    init: (filter.set ? _.identity) @data[name] ? filter.init ? ""
-                    setData: @setData
-            when "button"
-                return new ButtonFilter
-                    id: name
-                    name: filter.name ? @prettyName name
-                    off: filter.off ? "false"
-                    on: filter.on ? "true"
-                    filterClass: filter.className ? ""
-                    init: (filter.set ? _.identity) @data[name] ? filter.init ? filter.off ? "false"
-                    setData: @setData
+                return new DropdownFilter options
             when "input"
-                return new InputFilter
-                    id: name
-                    name: filter.name ? @prettyName name
-                    extraId: filter.extraId
-                    filterClass: filter.className ? ""
-                    get: filter.get ? _.identity
-                    getExtraId: filter.getExtraId ? _.identity
-                    init: (filter.set ? _.identity) @data[name] ? filter.init ? "", @data[filter.extraId] ? filter.extraInit ? ""
-                    setData: @setData
+                return new InputFilter options
+            when "button"
+                options.init ?= filter.off ? "false"
+                return new ButtonFilter options
             when "custom"
                 # For custom filters, we just provide the setData function
                 filter.setData = @setData
