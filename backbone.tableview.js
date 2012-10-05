@@ -39,7 +39,7 @@ Optionally it supports pagination, search, and any number of filters
                 options: ["all", "valid", "invalid"]
 */
 
-var ButtonFilter, ButtonOptionFilter, Filter, InputFilter,
+var ButtonFilter, ButtonOptionFilter, DropdownFilter, Filter, InputFilter,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
@@ -155,7 +155,7 @@ Backbone.TableView = (function(_super) {
   };
 
   TableView.prototype.createFilter = function(name, filter) {
-    var _ref, _ref1, _ref10, _ref11, _ref12, _ref13, _ref14, _ref15, _ref16, _ref17, _ref18, _ref19, _ref2, _ref20, _ref21, _ref22, _ref23, _ref24, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
+    var _ref, _ref1, _ref10, _ref11, _ref12, _ref13, _ref14, _ref15, _ref16, _ref17, _ref18, _ref19, _ref2, _ref20, _ref21, _ref22, _ref23, _ref24, _ref25, _ref26, _ref27, _ref28, _ref29, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
     switch (filter.type) {
       case "option":
         return new ButtonOptionFilter({
@@ -166,30 +166,39 @@ Backbone.TableView = (function(_super) {
           init: ((_ref4 = filter.set) != null ? _ref4 : _.identity)((_ref2 = (_ref3 = this.data[name]) != null ? _ref3 : filter.init) != null ? _ref2 : ""),
           setData: this.setData
         });
+      case "dropdown":
+        return new DropdownFilter({
+          id: name,
+          name: (_ref5 = filter.name) != null ? _ref5 : this.prettyName(name),
+          filterClass: (_ref6 = filter.className) != null ? _ref6 : "",
+          options: filter.options,
+          init: ((_ref9 = filter.set) != null ? _ref9 : _.identity)((_ref7 = (_ref8 = this.data[name]) != null ? _ref8 : filter.init) != null ? _ref7 : ""),
+          setData: this.setData
+        });
       case "button":
         return new ButtonFilter({
           id: name,
-          name: (_ref5 = filter.name) != null ? _ref5 : this.prettyName(name),
-          off: (_ref6 = filter.off) != null ? _ref6 : "false",
-          on: (_ref7 = filter.on) != null ? _ref7 : "true",
-          filterClass: (_ref8 = filter.className) != null ? _ref8 : "",
-          init: ((_ref12 = filter.set) != null ? _ref12 : _.identity)((_ref9 = (_ref10 = (_ref11 = this.data[name]) != null ? _ref11 : filter.init) != null ? _ref10 : filter.off) != null ? _ref9 : "false"),
+          name: (_ref10 = filter.name) != null ? _ref10 : this.prettyName(name),
+          off: (_ref11 = filter.off) != null ? _ref11 : "false",
+          on: (_ref12 = filter.on) != null ? _ref12 : "true",
+          filterClass: (_ref13 = filter.className) != null ? _ref13 : "",
+          init: ((_ref17 = filter.set) != null ? _ref17 : _.identity)((_ref14 = (_ref15 = (_ref16 = this.data[name]) != null ? _ref16 : filter.init) != null ? _ref15 : filter.off) != null ? _ref14 : "false"),
           setData: this.setData
         });
       case "input":
         return new InputFilter({
           id: name,
-          name: (_ref13 = filter.name) != null ? _ref13 : this.prettyName(name),
+          name: (_ref18 = filter.name) != null ? _ref18 : this.prettyName(name),
           extraId: filter.extraId,
-          filterClass: (_ref14 = filter.className) != null ? _ref14 : "",
-          get: (_ref15 = filter.get) != null ? _ref15 : _.identity,
-          getExtraId: (_ref16 = filter.getExtraId) != null ? _ref16 : _.identity,
-          init: ((_ref21 = filter.set) != null ? _ref21 : _.identity)((_ref17 = (_ref18 = this.data[name]) != null ? _ref18 : filter.init) != null ? _ref17 : "", (_ref19 = (_ref20 = this.data[filter.extraId]) != null ? _ref20 : filter.extraInit) != null ? _ref19 : ""),
+          filterClass: (_ref19 = filter.className) != null ? _ref19 : "",
+          get: (_ref20 = filter.get) != null ? _ref20 : _.identity,
+          getExtraId: (_ref21 = filter.getExtraId) != null ? _ref21 : _.identity,
+          init: ((_ref26 = filter.set) != null ? _ref26 : _.identity)((_ref22 = (_ref23 = this.data[name]) != null ? _ref23 : filter.init) != null ? _ref22 : "", (_ref24 = (_ref25 = this.data[filter.extraId]) != null ? _ref25 : filter.extraInit) != null ? _ref24 : ""),
           setData: this.setData
         });
       case "custom":
         filter.setData = this.setData;
-        filter.init = ((_ref24 = filter.set) != null ? _ref24 : _.identity)((_ref22 = (_ref23 = this.data[name]) != null ? _ref23 : filter.init) != null ? _ref22 : "");
+        filter.init = ((_ref29 = filter.set) != null ? _ref29 : _.identity)((_ref27 = (_ref28 = this.data[name]) != null ? _ref28 : filter.init) != null ? _ref27 : "");
         return filter;
     }
   };
@@ -538,5 +547,28 @@ ButtonOptionFilter = (function(_super) {
   };
 
   return ButtonOptionFilter;
+
+})(Filter);
+
+DropdownFilter = (function(_super) {
+
+  __extends(DropdownFilter, _super);
+
+  function DropdownFilter() {
+    this.update = __bind(this.update, this);
+    return DropdownFilter.__super__.constructor.apply(this, arguments);
+  }
+
+  DropdownFilter.prototype.template = _.template("<select class=\"filter\">\n    <% _.each(options, function (el, i) { %>\n        <option <%= init == el.value ? \"selected='selected'\" : \"\" %> value=\"<%= el.value %>\"><%= el.name %></button>\n    <% }) %>\n</select>");
+
+  DropdownFilter.prototype.events = {
+    "change .filter": "update"
+  };
+
+  DropdownFilter.prototype.update = function(e) {
+    return this.setData(this.id, e.currentTarget.value);
+  };
+
+  return DropdownFilter;
 
 })(Filter);

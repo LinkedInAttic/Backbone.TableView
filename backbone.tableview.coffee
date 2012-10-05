@@ -161,6 +161,14 @@ class Backbone.TableView extends Backbone.View
                     options: filter.options
                     init: (filter.set ? _.identity) @data[name] ? filter.init ? ""
                     setData: @setData
+            when "dropdown"
+                return new DropdownFilter
+                    id: name
+                    name: filter.name ? @prettyName name
+                    filterClass: filter.className ? ""
+                    options: filter.options
+                    init: (filter.set ? _.identity) @data[name] ? filter.init ? ""
+                    setData: @setData
             when "button"
                 return new ButtonFilter
                     id: name
@@ -406,4 +414,18 @@ class ButtonOptionFilter extends Filter
     update: (e) =>
         @$(".btn").removeClass "active"
         @$(e.currentTarget).addClass "active"
+        @setData @id, e.currentTarget.value
+
+class DropdownFilter extends Filter
+    template: _.template """
+        <select class="filter">
+            <% _.each(options, function (el, i) { %>
+                <option <%= init == el.value ? "selected='selected'" : "" %> value="<%= el.value %>"><%= el.name %></button>
+            <% }) %>
+        </select>
+    """
+    events:
+        "change .filter": "update"
+
+    update: (e) =>
         @setData @id, e.currentTarget.value
