@@ -189,15 +189,10 @@ class Backbone.TableView extends Backbone.View
         if @router
             uri = Backbone.history.fragment
             if (i = uri.indexOf "?") >= 0
-                uri = uri.substring(0, i)
-            first = true
-            for key, val of @data
-                if first
-                    first = false
-                    separator = "?"
-                else
-                    separator = "&"
-                uri = uri + separator + encodeURIComponent(key) + "=" + encodeURIComponent(val)
+                uri = uri.substring 0, i
+            param = $.param @data
+            if param
+                uri += "?" + param
             @router.navigate uri, replace: replace
         return @
 

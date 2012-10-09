@@ -196,23 +196,15 @@ Optionally it supports pagination, search, and any number of filters
     };
 
     TableView.prototype.updateUrl = function(replace) {
-      var first, i, key, separator, uri, val, _ref;
+      var i, param, uri;
       if (this.router) {
         uri = Backbone.history.fragment;
         if ((i = uri.indexOf("?")) >= 0) {
           uri = uri.substring(0, i);
         }
-        first = true;
-        _ref = this.data;
-        for (key in _ref) {
-          val = _ref[key];
-          if (first) {
-            first = false;
-            separator = "?";
-          } else {
-            separator = "&";
-          }
-          uri = uri + separator + encodeURIComponent(key) + "=" + encodeURIComponent(val);
+        param = $.param(this.data);
+        if (param) {
+          uri += "?" + param;
         }
         this.router.navigate(uri, {
           replace: replace
