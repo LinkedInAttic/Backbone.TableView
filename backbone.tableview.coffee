@@ -166,14 +166,14 @@ class Backbone.TableView extends Backbone.View
             getExtraId: filter.getExtraId ? _.identity
         switch filter.type
             when "option"
-                return new ButtonOptionFilter options
+                return new Backbone.TableView.ButtonOptionFilter options
             when "dropdown"
-                return new DropdownFilter options
+                return new Backbone.TableView.DropdownFilter options
             when "input"
-                return new InputFilter options
+                return new Backbone.TableView.InputFilter options
             when "button"
                 options.init ?= filter.off ? "false"
-                return new ButtonFilter options
+                return new Backbone.TableView.ButtonFilter options
             when "custom"
                 # For custom filters, we just provide the setData function
                 filter.setData = @setData
@@ -331,7 +331,7 @@ Filters
 -------
 ###
 
-class Filter extends Backbone.View
+class Backbone.TableView.Filter extends Backbone.View
     tagName: "div"
     className: "pull-left tableview-filterbox"
 
@@ -356,7 +356,7 @@ class Filter extends Backbone.View
         @$el.html @template @options
         return @
 
-class InputFilter extends Filter
+class Backbone.TableView.InputFilter extends Backbone.TableView.Filter
     template: _.template """
         <span class="add-on"><%= name %></span><input type="text" class="filter <%= filterClass %>" value="<%= init %>"></input>
     """
@@ -370,7 +370,7 @@ class InputFilter extends Filter
         else
             @setData @id, @options.get e.currentTarget.value
 
-class ButtonFilter extends Filter
+class Backbone.TableView.ButtonFilter extends Backbone.TableView.Filter
     template: _.template """
         <button type="button" class="filter btn <%= init == on ? "active" : "" %> <%= filterClass %>"><%= name %></button>
     """
@@ -387,7 +387,7 @@ class ButtonFilter extends Filter
         @current = 1 - @current
         @setData @id, @values[@current]
 
-class ButtonOptionFilter extends Filter
+class Backbone.TableView.ButtonOptionFilter extends Backbone.TableView.Filter
     template: _.template """
         <% _.each(options, function (el, i) { %>
             <button class="btn <%= init == el.value ? "active" : "" %>" value="<%= el.value %>"><%= el.name %></button>
@@ -402,7 +402,7 @@ class ButtonOptionFilter extends Filter
         @$(e.currentTarget).addClass "active"
         @setData @id, e.currentTarget.value
 
-class DropdownFilter extends Filter
+class Backbone.TableView.DropdownFilter extends Backbone.TableView.Filter
     template: _.template """
         <select class="filter <%= filterClass %>">
             <% _.each(options, function (el, i) { %>

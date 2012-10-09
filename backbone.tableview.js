@@ -39,8 +39,7 @@ Optionally it supports pagination, search, and any number of filters
                 options: ["all", "valid", "invalid"]
 */
 
-var ButtonFilter, ButtonOptionFilter, DropdownFilter, Filter, InputFilter,
-  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   __slice = [].slice;
@@ -171,16 +170,16 @@ Backbone.TableView = (function(_super) {
     };
     switch (filter.type) {
       case "option":
-        return new ButtonOptionFilter(options);
+        return new Backbone.TableView.ButtonOptionFilter(options);
       case "dropdown":
-        return new DropdownFilter(options);
+        return new Backbone.TableView.DropdownFilter(options);
       case "input":
-        return new InputFilter(options);
+        return new Backbone.TableView.InputFilter(options);
       case "button":
         if ((_ref11 = options.init) == null) {
           options.init = (_ref12 = filter.off) != null ? _ref12 : "false";
         }
-        return new ButtonFilter(options);
+        return new Backbone.TableView.ButtonFilter(options);
       case "custom":
         filter.setData = this.setData;
         filter.init = ((_ref15 = filter.set) != null ? _ref15 : _.identity)((_ref13 = (_ref14 = this.data[name]) != null ? _ref14 : filter.init) != null ? _ref13 : "");
@@ -402,7 +401,7 @@ Filters
 */
 
 
-Filter = (function(_super) {
+Backbone.TableView.Filter = (function(_super) {
 
   __extends(Filter, _super);
 
@@ -448,7 +447,7 @@ Filter = (function(_super) {
 
 })(Backbone.View);
 
-InputFilter = (function(_super) {
+Backbone.TableView.InputFilter = (function(_super) {
 
   __extends(InputFilter, _super);
 
@@ -475,9 +474,9 @@ InputFilter = (function(_super) {
 
   return InputFilter;
 
-})(Filter);
+})(Backbone.TableView.Filter);
 
-ButtonFilter = (function(_super) {
+Backbone.TableView.ButtonFilter = (function(_super) {
 
   __extends(ButtonFilter, _super);
 
@@ -506,9 +505,9 @@ ButtonFilter = (function(_super) {
 
   return ButtonFilter;
 
-})(Filter);
+})(Backbone.TableView.Filter);
 
-ButtonOptionFilter = (function(_super) {
+Backbone.TableView.ButtonOptionFilter = (function(_super) {
 
   __extends(ButtonOptionFilter, _super);
 
@@ -533,9 +532,9 @@ ButtonOptionFilter = (function(_super) {
 
   return ButtonOptionFilter;
 
-})(Filter);
+})(Backbone.TableView.Filter);
 
-DropdownFilter = (function(_super) {
+Backbone.TableView.DropdownFilter = (function(_super) {
 
   __extends(DropdownFilter, _super);
 
@@ -556,4 +555,4 @@ DropdownFilter = (function(_super) {
 
   return DropdownFilter;
 
-})(Filter);
+})(Backbone.TableView.Filter);
