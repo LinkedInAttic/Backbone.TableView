@@ -172,7 +172,8 @@ class Backbone.TableView extends Backbone.View
             when "input"
                 return new Backbone.TableView.InputFilter options
             when "button"
-                options.init ?= filter.off ? "false"
+                if not options.init
+                    options.init = filter.off ? "false"
                 return new Backbone.TableView.ButtonFilter options
             when "custom"
                 # For custom filters, we just provide the setData function

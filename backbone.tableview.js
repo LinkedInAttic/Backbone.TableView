@@ -158,7 +158,7 @@ Optionally it supports pagination, search, and any number of filters
     };
 
     TableView.prototype.createFilter = function(name, filter) {
-      var options, _ref, _ref1, _ref10, _ref11, _ref12, _ref13, _ref14, _ref15, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
+      var options, _ref, _ref1, _ref10, _ref11, _ref12, _ref13, _ref14, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
       options = {
         id: name,
         extraId: filter.extraId,
@@ -180,13 +180,13 @@ Optionally it supports pagination, search, and any number of filters
         case "input":
           return new Backbone.TableView.InputFilter(options);
         case "button":
-          if ((_ref11 = options.init) == null) {
-            options.init = (_ref12 = filter.off) != null ? _ref12 : "false";
+          if (!options.init) {
+            options.init = (_ref11 = filter.off) != null ? _ref11 : "false";
           }
           return new Backbone.TableView.ButtonFilter(options);
         case "custom":
           filter.setData = this.setData;
-          filter.init = ((_ref15 = filter.set) != null ? _ref15 : _.identity)((_ref13 = (_ref14 = this.data[name]) != null ? _ref14 : filter.init) != null ? _ref13 : "");
+          filter.init = ((_ref14 = filter.set) != null ? _ref14 : _.identity)((_ref12 = (_ref13 = this.data[name]) != null ? _ref13 : filter.init) != null ? _ref12 : "");
           return filter;
       }
     };
