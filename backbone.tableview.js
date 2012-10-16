@@ -109,11 +109,9 @@ Optionally it supports pagination, search, and any number of filters
       _ref = this.options;
       for (key in _ref) {
         val = _ref[key];
-        if (!(this[key] != null)) {
-          this[key] = val;
-        }
+        this[key] = val;
       }
-      this.data = _.extend({}, this.initialData);
+      this.data = _.clone(this.initialData);
       if (this.router) {
         this.data = _.extend(this.data, this.parseQueryString(Backbone.history.fragment));
       }
@@ -348,7 +346,7 @@ Optionally it supports pagination, search, and any number of filters
     };
 
     TableView.prototype.render = function() {
-      var filters, filtersDiv, filtersSize, searchSize, titleSize,
+      var filter, filters, filtersDiv, filtersSize, searchSize, titleSize, _i, _len,
         _this = this;
       titleSize = 3;
       filtersSize = 6;
@@ -375,9 +373,10 @@ Optionally it supports pagination, search, and any number of filters
         return _this.createFilter(name, filter);
       }));
       filtersDiv = this.$(".filters");
-      _.each(filters, function(filter) {
-        return filtersDiv.append(filter.render().el);
-      });
+      for (_i = 0, _len = filters.length; _i < _len; _i++) {
+        filter = filters[_i];
+        filtersDiv.append(filter.render().el);
+      }
       return this.update(true, this.skipInitialFetch);
     };
 

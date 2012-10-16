@@ -117,8 +117,8 @@ class Backbone.TableView extends Backbone.View
     initialize: ->
         @collection.on "reset", @renderData
         for key, val of @options
-            if not this[key]? then this[key] = val
-        @data = _.extend({}, @initialData)
+            this[key] = val
+        @data = _.clone @initialData
         if @router
             @data = _.extend(@data, @parseQueryString Backbone.history.fragment)
         if @pagination
@@ -315,7 +315,8 @@ class Backbone.TableView extends Backbone.View
 
         filters = _.compact _.map @filters, (filter, name) => @createFilter(name, filter)
         filtersDiv = @$(".filters")
-        _.each filters, (filter) -> filtersDiv.append filter.render().el
+        for filter in filters
+            filtersDiv.append filter.render().el
         @update true, @skipInitialFetch
 
     # Helper function to prettify names (eg. hi_world -> Hi World)
