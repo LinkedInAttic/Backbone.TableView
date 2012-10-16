@@ -111,7 +111,7 @@ Optionally it supports pagination, search, and any number of filters
         val = _ref[key];
         this[key] = val;
       }
-      this.data = _.clone(this.initialData);
+      this.data = _.extend({}, this.initialData);
       if (this.router) {
         this.data = _.extend(this.data, this.parseQueryString(Backbone.history.fragment));
       }

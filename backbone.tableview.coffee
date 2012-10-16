@@ -118,7 +118,7 @@ class Backbone.TableView extends Backbone.View
         @collection.on "reset", @renderData
         for key, val of @options
             this[key] = val
-        @data = _.clone @initialData
+        @data = _.extend {}, @initialData
         if @router
             @data = _.extend(@data, @parseQueryString Backbone.history.fragment)
         if @pagination
