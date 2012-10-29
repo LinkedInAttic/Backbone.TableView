@@ -104,7 +104,7 @@ Optionally it supports pagination, search, and any number of filters
     };
 
     TableView.prototype.initialize = function() {
-      var key, val, _ref;
+      var key, val, _ref, _ref1, _ref2;
       this.collection.on("reset", this.renderData);
       _ref = this.options;
       for (key in _ref) {
@@ -116,8 +116,8 @@ Optionally it supports pagination, search, and any number of filters
         this.data = _.extend(this.data, this.parseQueryString(Backbone.history.fragment));
       }
       if (this.pagination) {
-        this.data.page = parseInt(this.data.page) || this.page || 1;
-        this.data.size = parseInt(this.data.size) || this.size || 10;
+        this.data.page = (_ref1 = parseInt(this.data.page) || this.page) != null ? _ref1 : 1;
+        this.data.size = (_ref2 = parseInt(this.data.size) || this.size) != null ? _ref2 : 10;
       }
       return this;
     };
@@ -269,26 +269,26 @@ Optionally it supports pagination, search, and any number of filters
     };
 
     TableView.prototype.renderData = function() {
-      var body, col, column, model, name, row, _i, _len, _ref, _ref1;
+      var body, col, column, model, name, row, _i, _len, _ref, _ref1, _ref2, _ref3;
       body = this.$("tbody");
       if (this.collection.models.length === 0) {
         body.html(this.emptyTemplate({
-          text: this.empty || "No records to show"
+          text: (_ref = this.empty) != null ? _ref : "No records to show"
         }));
       } else {
         body.html("");
-        _ref = this.collection.models;
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          model = _ref[_i];
+        _ref1 = this.collection.models;
+        for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+          model = _ref1[_i];
           row = $("<tr>");
-          _ref1 = this.columns;
-          for (name in _ref1) {
-            column = _ref1[name];
+          _ref2 = this.columns;
+          for (name in _ref2) {
+            column = _ref2[name];
             col = $("<td>").addClass(column.className).addClass(column.tdClass);
             if (column.draw != null) {
               col.html(column.draw(model, this));
             } else {
-              col.text(model.get(name) || "");
+              col.text((_ref3 = model.get(name)) != null ? _ref3 : "");
             }
             row.append(col);
           }
@@ -363,7 +363,6 @@ Optionally it supports pagination, search, and any number of filters
         filtersSize = 0;
       }
       this.$el.html(this.template({
-        empty: this.empty || "",
         title: this.applyTemplate(this.titleTemplate, this.title, titleSize),
         search: this.applyTemplate(this.searchTemplate, this.search, searchSize),
         filters: this.applyTemplate(this.filtersTemplate, this.filters, filtersSize),

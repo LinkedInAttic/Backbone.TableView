@@ -122,8 +122,8 @@ class Backbone.TableView extends Backbone.View
         if @router
             @data = _.extend(@data, @parseQueryString Backbone.history.fragment)
         if @pagination
-            @data.page = parseInt(@data.page) or @page or 1
-            @data.size = parseInt(@data.size) or @size or 10
+            @data.page = parseInt(@data.page) or @page ? 1
+            @data.size = parseInt(@data.size) or @size ? 10
         return @
 
     # Return a parsed querystring with the "?" (eg. query = "/users?hi=1&bye=hello"
@@ -238,7 +238,7 @@ class Backbone.TableView extends Backbone.View
     renderData: =>
         body = @$("tbody")
         if @collection.models.length == 0
-            body.html @emptyTemplate text: @empty or "No records to show"
+            body.html @emptyTemplate text: @empty ? "No records to show"
         else
             body.html ""
             for model in @collection.models
@@ -248,7 +248,7 @@ class Backbone.TableView extends Backbone.View
                     if column.draw?
                         col.html column.draw model, @
                     else
-                        col.text model.get(name) or ""
+                        col.text model.get(name) ? ""
                     row.append col
                 body.append row
         if @pagination
@@ -307,7 +307,6 @@ class Backbone.TableView extends Backbone.View
             titleSize += filtersSize
             filtersSize = 0
         @$el.html @template
-            empty:   @empty or ""
             title:   @applyTemplate @titleTemplate,   @title,   titleSize
             search:  @applyTemplate @searchTemplate,  @search,  searchSize
             filters: @applyTemplate @filtersTemplate, @filters, filtersSize
