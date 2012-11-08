@@ -523,14 +523,13 @@ Optionally it supports pagination, search, and any number of filters
       var values,
         _this = this;
       this.$(e.currentTarget).toggleClass("active");
-      values = _.map(this.$(".btn"), function(btn) {
+      values = _.compact(_.map(this.$(".btn"), function(btn) {
         if (_this.$(btn).hasClass("active")) {
           return _this.$(btn).attr("value");
         } else {
           return null;
         }
-      });
-      values = _.compact(values);
+      }));
       return this.setData(this.id, this.options.get(values));
     };
 

@@ -380,7 +380,6 @@ class Backbone.TableView.ButtonFilter extends Backbone.TableView.Filter
         @values = [@options.off, @options.on]
         @current = if @options.init == @options.off then 0 else 1
 
-
     update: (e) =>
         @$(e.currentTarget).toggleClass "active"
         @current = 1 - @current
@@ -398,9 +397,8 @@ class Backbone.TableView.ButtonGroupFilter extends Backbone.TableView.Filter
 
     update: (e) =>
         @$(e.currentTarget).toggleClass "active"
-        values = _.map @$(".btn"), (btn) =>
+        values = _.compact _.map @$(".btn"), (btn) =>
             if @$(btn).hasClass("active") then @$(btn).attr "value" else null
-        values = _.compact(values)
         @setData @id, @options.get values
 
 class Backbone.TableView.ButtonOptionFilter extends Backbone.TableView.Filter
