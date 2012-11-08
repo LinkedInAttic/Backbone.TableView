@@ -175,6 +175,8 @@ class Backbone.TableView extends Backbone.View
                 if not options.init
                     options.init = filter.off ? "false"
                 return new Backbone.TableView.ButtonFilter options
+            when "buttongroup"
+                return new Backbone.TableView.ButtonGroupFilter options
             when "custom"
                 # For custom filters, we just provide the setData function
                 filter.setData = @setData
@@ -339,14 +341,14 @@ class Backbone.TableView.Filter extends Backbone.View
             (option) =>
                 value = option
                 if _.isArray value
-                    name = value[0]
-                    value = value[1]
-                else if _.isObject value
-                    name = option.name
-                    value = option.value
-                else
-                    name = option
-                {name: name, value: value}
+                    value =
+                        name: value[0]
+                        value: value[1]
+                else if not _.isObject value
+                    value =
+                        name: value
+                        value: value
+                value
 
     render: =>
         @$el.html @template @options
@@ -378,10 +380,28 @@ class Backbone.TableView.ButtonFilter extends Backbone.TableView.Filter
         @values = [@options.off, @options.on]
         @current = if @options.init == @options.off then 0 else 1
 
+
     update: (e) =>
         @$(e.currentTarget).toggleClass "active"
         @current = 1 - @current
         @setData @id, @values[@current]
+
+class Backbone.TableView.ButtonGroupFilter extends Backbone.TableView.Filter
+    template: _.template """
+        <% _.each(options, function (el, i) { %>
+            <button class="btn <%= _.contains(init, el.value) ? "active" : "" %> <%= !_.isUndefined(el.className) ? el.className : "" %>" value="<%= el.value %>"><%= el.name %></button>
+        <% }) %>
+    """
+    className: "btn-group pull-left tableview-filterbox"
+    events:
+        "click .btn": "update"
+
+    update: (e) =>
+        @$(e.currentTarget).toggleClass "active"
+        values = _.map @$(".btn"), (btn) =>
+            if @$(btn).hasClass("active") then @$(btn).attr "value" else null
+        values = _.compact(values)
+        @setData @id, @options.get values
 
 class Backbone.TableView.ButtonOptionFilter extends Backbone.TableView.Filter
     template: _.template """
