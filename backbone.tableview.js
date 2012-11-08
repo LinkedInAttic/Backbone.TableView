@@ -182,6 +182,8 @@ Optionally it supports pagination, search, and any number of filters
             options.init = (_ref11 = filter.off) != null ? _ref11 : "false";
           }
           return new Backbone.TableView.ButtonFilter(options);
+        case "buttongroup":
+          return new Backbone.TableView.ButtonGroupFilter(options);
         case "custom":
           filter.setData = this.setData;
           filter.init = ((_ref14 = filter.set) != null ? _ref14 : _.identity)((_ref12 = (_ref13 = this.data[name]) != null ? _ref13 : filter.init) != null ? _ref12 : "");
@@ -414,21 +416,20 @@ Optionally it supports pagination, search, and any number of filters
       this.extraId = this.options.extraId;
       this.setData = this.options.setData;
       return this.options.options = _.map(_.result(this.options, "options"), function(option) {
-        var name, value;
+        var value;
         value = option;
         if (_.isArray(value)) {
-          name = value[0];
-          value = value[1];
-        } else if (_.isObject(value)) {
-          name = option.name;
-          value = option.value;
-        } else {
-          name = option;
+          value = {
+            name: value[0],
+            value: value[1]
+          };
+        } else if (!_.isObject(value)) {
+          value = {
+            name: value,
+            value: value
+          };
         }
-        return {
-          name: name,
-          value: value
-        };
+        return value;
       });
     };
 
@@ -498,6 +499,42 @@ Optionally it supports pagination, search, and any number of filters
     };
 
     return ButtonFilter;
+
+  })(Backbone.TableView.Filter);
+
+  Backbone.TableView.ButtonGroupFilter = (function(_super) {
+
+    __extends(ButtonGroupFilter, _super);
+
+    function ButtonGroupFilter() {
+      this.update = __bind(this.update, this);
+      return ButtonGroupFilter.__super__.constructor.apply(this, arguments);
+    }
+
+    ButtonGroupFilter.prototype.template = _.template("<% _.each(options, function (el, i) { %>\n    <button class=\"btn <%= _.contains(init, el.value) ? \"active\" : \"\" %> <%= !_.isUndefined(el.className) ? el.className : \"\" %>\" value=\"<%= el.value %>\"><%= el.name %></button>\n<% }) %>");
+
+    ButtonGroupFilter.prototype.className = "btn-group pull-left tableview-filterbox";
+
+    ButtonGroupFilter.prototype.events = {
+      "click .btn": "update"
+    };
+
+    ButtonGroupFilter.prototype.update = function(e) {
+      var values,
+        _this = this;
+      this.$(e.currentTarget).toggleClass("active");
+      values = _.map(this.$(".btn"), function(btn) {
+        if (_this.$(btn).hasClass("active")) {
+          return _this.$(btn).attr("value");
+        } else {
+          return null;
+        }
+      });
+      values = _.compact(values);
+      return this.setData(this.id, this.options.get(values));
+    };
+
+    return ButtonGroupFilter;
 
   })(Backbone.TableView.Filter);
 
