@@ -54,7 +54,7 @@ Juan Pablo Bottaro - https://github.com/jpbottaro
 
 ## Demo
 
-[http://jsfiddle.net/jpbottaro/COMPLETE/](http://jsfiddle.net/jpbottaro/COMPLETE/)
+[http://jsfiddle.net/jpbottaro/u7zQT/](http://jsfiddle.net/jpbottaro/u7zQT/)
 
 ## Thanks
 
