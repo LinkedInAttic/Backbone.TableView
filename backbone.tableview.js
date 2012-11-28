@@ -83,7 +83,7 @@ Optionally it supports pagination, search, and any number of filters
 
     TableView.prototype.titleTemplate = _.template("<div class=\"<%= classSize %>\">\n    <h4 class=\"<%= model.className || \"\" %>\"><%= model.name || model %></h4>\n</div>");
 
-    TableView.prototype.filtersTemplate = _.template("<div class=\"filters controls pagination-centered <%= classSize %>\">\n</div>");
+    TableView.prototype.filtersTemplate = _.template("<div class=\"filters controls tableview-center <%= classSize %>\">\n</div>");
 
     TableView.prototype.searchTemplate = _.template("<div class=\"<%= classSize %>\">\n    <input type=\"text\" class=\"search-query input-block-level pull-right\" placeholder=\"<%= model.detail || model %>\" value=\"<%- data[model.query || \"q\"] || \"\" %>\"></input>\n</div>");
 
@@ -293,6 +293,9 @@ Optionally it supports pagination, search, and any number of filters
               col.text((_ref3 = model.get(name)) != null ? _ref3 : "");
             }
             row.append(col);
+          }
+          if (this.rowTransformer != null) {
+            row = this.rowTransformer(row, model);
           }
           body.append(row);
         }

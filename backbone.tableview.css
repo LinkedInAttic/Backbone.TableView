@@ -44,3 +44,6 @@ div.tableview-pagination {
     border-top: 4px solid black;
     visibility: visible;
 }
+.tableview-center {
+    text-align: center;
+}
