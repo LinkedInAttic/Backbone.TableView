@@ -294,6 +294,9 @@ Optionally it supports pagination, search, and any number of filters
             }
             row.append(col);
           }
+          if (this.rowTransformer != null) {
+            row = this.rowTransformer(row, model);
+          }
           body.append(row);
         }
       }

@@ -252,6 +252,7 @@ class Backbone.TableView extends Backbone.View
                     else
                         col.text model.get(name) ? ""
                     row.append col
+                row = @rowTransformer(row, model) if @rowTransformer?
                 body.append row
         if @pagination
             @refreshPagination()
