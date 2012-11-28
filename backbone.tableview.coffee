@@ -45,7 +45,7 @@ class Backbone.TableView extends Backbone.View
         </div>
     """
     filtersTemplate: _.template """
-        <div class="filters controls pagination-centered <%= classSize %>">
+        <div class="filters controls tableview-center <%= classSize %>">
         </div>
     """
     searchTemplate: _.template """
