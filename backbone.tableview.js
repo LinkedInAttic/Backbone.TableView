@@ -105,7 +105,7 @@ Optionally it supports pagination, search, and any number of filters
 
     TableView.prototype.initialize = function() {
       var key, val, _ref, _ref1, _ref2;
-      this.events = _.extend(this.myEvents, this.events);
+      this.events = _.extend(_.clone(this.myEvents), this.events);
       this.collection.on("reset", this.renderData);
       _ref = this.options;
       for (key in _ref) {
