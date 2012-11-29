@@ -106,7 +106,7 @@ class Backbone.TableView extends Backbone.View
         <div id="pagination-main">
         </div>
     """
-    events:
+    myEvents:
         "change .search-query":              "updateSearch"
         "click  th":                         "toggleSort"
         "click  .pager-page:not(.active)":   "toPage"
@@ -115,6 +115,7 @@ class Backbone.TableView extends Backbone.View
 
     # Binds the collection update event for rendering
     initialize: ->
+        @events = _.extend @myEvents, @events
         @collection.on "reset", @renderData
         for key, val of @options
             this[key] = val
