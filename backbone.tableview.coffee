@@ -115,7 +115,7 @@ class Backbone.TableView extends Backbone.View
 
     # Binds the collection update event for rendering
     initialize: ->
-        @events = _.extend @myEvents, @events
+        @events = _.extend _.clone(@myEvents), @events
         @collection.on "reset", @renderData
         for key, val of @options
             this[key] = val
