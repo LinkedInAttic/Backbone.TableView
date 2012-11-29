@@ -95,7 +95,7 @@ Optionally it supports pagination, search, and any number of filters
 
     TableView.prototype.template = _.template("<div class=\"row-fluid\">\n    <%= title %>\n\n    <%= filters %>\n\n    <%= search %>\n</div>\n\n<table class=\"table table-striped tableview-table\">\n    <thead>\n        <tr>\n            <%= columns %>\n        </tr>\n    </thead>\n    <tbody class=\"fade\">\n    </tbody>\n</table>\n\n<div id=\"pagination-main\">\n</div>");
 
-    TableView.prototype.events = {
+    TableView.prototype.myEvents = {
       "change .search-query": "updateSearch",
       "click  th": "toggleSort",
       "click  .pager-page:not(.active)": "toPage",
@@ -105,6 +105,7 @@ Optionally it supports pagination, search, and any number of filters
 
     TableView.prototype.initialize = function() {
       var key, val, _ref, _ref1, _ref2;
+      this.events = _.extend(this.myEvents, this.events);
       this.collection.on("reset", this.renderData);
       _ref = this.options;
       for (key in _ref) {
@@ -271,7 +272,7 @@ Optionally it supports pagination, search, and any number of filters
     };
 
     TableView.prototype.renderData = function() {
-      var body, col, column, model, name, row, _i, _len, _ref, _ref1, _ref2, _ref3;
+      var body, col, column, model, name, row, _i, _len, _ref, _ref1, _ref2, _ref3, _ref4;
       body = this.$("tbody");
       if (this.collection.models.length === 0) {
         body.html(this.emptyTemplate({
@@ -294,10 +295,7 @@ Optionally it supports pagination, search, and any number of filters
             }
             row.append(col);
           }
-          if (this.rowTransformer != null) {
-            row = this.rowTransformer(row, model);
-          }
-          body.append(row);
+          body.append((_ref4 = typeof this.rowTransformer === "function" ? this.rowTransformer(row, model) : void 0) != null ? _ref4 : row);
         }
       }
       if (this.pagination) {
