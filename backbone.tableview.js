@@ -214,16 +214,18 @@ Optionally it supports pagination, search, and any number of filters
       return this;
     };
 
-    TableView.prototype.update = function(replace, skipFetch) {
+    TableView.prototype.update = function(replace, justRender) {
       this.$("tbody").removeClass("in");
       this.trigger("updating");
       this.updateUrl(replace);
-      if (!skipFetch) {
-        this.collection.fetch({
-          data: (typeof this.filterData === "function" ? this.filterData(_.clone(this.data)) : void 0) || this.data
-        });
-      } else {
+      if (justRender) {
         this.renderData();
+      } else {
+        if (!this.noFetch) {
+          this.collection.fetch({
+            data: (typeof this.filterData === "function" ? this.filterData(_.clone(this.data)) : void 0) || this.data
+          });
+        }
       }
       return this;
     };

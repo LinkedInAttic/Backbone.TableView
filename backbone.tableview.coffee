@@ -201,14 +201,15 @@ class Backbone.TableView extends Backbone.View
         return @
 
     # Update the collection given all the options/filters
-    update: (replace, skipFetch) =>
+    update: (replace, justRender) =>
         @$("tbody").removeClass("in")
         @trigger "updating"
         @updateUrl replace
-        if not skipFetch
-            @collection.fetch data: @filterData?(_.clone(@data)) or @data
-        else
+        if justRender
             @renderData()
+        else
+            if not @noFetch
+                @collection.fetch data: @filterData?(_.clone(@data)) or @data
         return @
 
     # Refresh the pagination div at the bottom
