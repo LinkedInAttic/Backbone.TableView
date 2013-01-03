@@ -214,8 +214,8 @@ class Backbone.TableView extends Backbone.View
 
     # Refresh the pagination div at the bottom
     refreshPagination: =>
-        @data.page = @collection.getData?("page") ? @data.page
-        @data.size = @collection.getData?("size") ? @data.size
+        @data.page = parseInt(@collection.getData?("page")) or @data.page
+        @data.size = parseInt(@collection.getData?("size")) or @data.size
         from = (@data.page - 1) * @data.size
         to   = from + @collection.size()
         if @collection.size() > 0 then from++

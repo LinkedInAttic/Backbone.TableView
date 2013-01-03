@@ -231,9 +231,9 @@ Optionally it supports pagination, search, and any number of filters
     };
 
     TableView.prototype.refreshPagination = function() {
-      var from, i, max, maxPage, pageFrom, pageTo, pages, to, total, _base, _base1, _ref, _ref1;
-      this.data.page = (_ref = typeof (_base = this.collection).getData === "function" ? _base.getData("page") : void 0) != null ? _ref : this.data.page;
-      this.data.size = (_ref1 = typeof (_base1 = this.collection).getData === "function" ? _base1.getData("size") : void 0) != null ? _ref1 : this.data.size;
+      var from, i, max, maxPage, pageFrom, pageTo, pages, to, total, _base, _base1;
+      this.data.page = parseInt(typeof (_base = this.collection).getData === "function" ? _base.getData("page") : void 0) || this.data.page;
+      this.data.size = parseInt(typeof (_base1 = this.collection).getData === "function" ? _base1.getData("size") : void 0) || this.data.size;
       from = (this.data.page - 1) * this.data.size;
       to = from + this.collection.size();
       if (this.collection.size() > 0) {
@@ -252,11 +252,11 @@ Optionally it supports pagination, search, and any number of filters
         total = " of " + max + " entries";
       }
       pages = (function() {
-        var _i, _len, _ref2, _results;
-        _ref2 = _.range(pageFrom, pageTo + 1);
+        var _i, _len, _ref, _results;
+        _ref = _.range(pageFrom, pageTo + 1);
         _results = [];
-        for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
-          i = _ref2[_i];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          i = _ref[_i];
           _results.push({
             number: i,
             active: (i === this.data.page && "active") || ""
