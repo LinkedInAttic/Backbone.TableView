@@ -117,6 +117,9 @@ class Backbone.TableView extends Backbone.View
     initialize: ->
         @events = _.extend _.clone(@myEvents), @events
         @collection.on "reset", @renderData
+        @collection.on "add", @renderData
+        @collection.on "remove", @renderData
+        @collection.on "destroy", @renderData
         for key, val of @options
             this[key] = val
         @data = _.extend {}, @initialData
