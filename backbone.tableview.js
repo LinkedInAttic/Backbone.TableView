@@ -91,7 +91,7 @@ Optionally it supports pagination, search, and any number of filters
 
     TableView.prototype.emptyTemplate = _.template("<tr>\n    <td colspan=\"10\"><%= text %></td>\n</tr>");
 
-    TableView.prototype.columnsTemplate = _.template("<% _.each(model, function (col, key) { %>\n    <% if (!col.noshow) { %>\n        <th abbr=\"<%= key || col %>\"\n         class=\"<%= !col.nosort ? \"tableview-sorting\" : \"\" %> <%= ((key || col) == data.sort_col) ? \"tableview-sorting-\" + data.sort_dir : \"\" %> <%= col.className || \"\" %>\">\n            <%= col.header || key %>\n        </th>\n    <% } %>\n<% }) %>");
+    TableView.prototype.columnsTemplate = _.template("<% _.each(model, function (col, key) { %>\n    <% if (!col.noshow) { %>\n        <th abbr=\"<%= key || col %>\"\n         class=\"<%= !col.nosort && !self.nosort ? \"tableview-sorting\" : \"\" %> <%= ((key || col) == data.sort_col) ? \"tableview-sorting-\" + data.sort_dir : \"\" %> <%= col.className || \"\" %>\">\n            <%= col.header || key %>\n        </th>\n    <% } %>\n<% }) %>");
 
     TableView.prototype.template = _.template("<div class=\"row-fluid\">\n    <%= title %>\n\n    <%= filters %>\n\n    <%= search %>\n</div>\n\n<table class=\"table table-striped tableview-table\">\n    <thead>\n        <tr>\n            <%= columns %>\n        </tr>\n    </thead>\n    <tbody class=\"fade\">\n    </tbody>\n</table>\n\n<div id=\"pagination-main\">\n</div>");
 
@@ -353,7 +353,8 @@ Optionally it supports pagination, search, and any number of filters
       return (model && size && template({
         data: this.data,
         model: model,
-        classSize: "span" + size
+        classSize: "span" + size,
+        self: this
       })) || "";
     };
 

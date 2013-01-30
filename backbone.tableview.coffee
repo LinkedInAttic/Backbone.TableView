@@ -80,7 +80,7 @@ class Backbone.TableView extends Backbone.View
         <% _.each(model, function (col, key) { %>
             <% if (!col.noshow) { %>
                 <th abbr="<%= key || col %>"
-                 class="<%= !col.nosort ? "tableview-sorting" : "" %> <%= ((key || col) == data.sort_col) ? "tableview-sorting-" + data.sort_dir : "" %> <%= col.className || "" %>">
+                 class="<%= !col.nosort && !self.nosort ? "tableview-sorting" : "" %> <%= ((key || col) == data.sort_col) ? "tableview-sorting-" + data.sort_dir : "" %> <%= col.className || "" %>">
                     <%= col.header || key %>
                 </th>
             <% } %>
@@ -301,7 +301,7 @@ class Backbone.TableView extends Backbone.View
     # string if model is false/undefined
     applyTemplate: (template, model, size) ->
         if not size? then size = 12
-        (model and size and template data: @data, model: model, classSize: "span" + size) or ""
+        (model and size and template data: @data, model: model, classSize: "span" + size, self: @) or ""
 
     # Render skeleton of the table, creating filters and other additions,
     # and trigger an update of the collection
