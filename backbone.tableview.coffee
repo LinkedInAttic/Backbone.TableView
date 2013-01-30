@@ -78,10 +78,12 @@ class Backbone.TableView extends Backbone.View
     """
     columnsTemplate: _.template """
         <% _.each(model, function (col, key) { %>
-            <th abbr="<%= key || col %>"
-             class="<%= !col.nosort ? "tableview-sorting" : "" %> <%= ((key || col) == data.sort_col) ? "tableview-sorting-" + data.sort_dir : "" %> <%= col.className || "" %>">
-                <%= col.header || key %>
-            </th>
+            <% if (!col.noshow) { %>
+                <th abbr="<%= key || col %>"
+                 class="<%= !col.nosort ? "tableview-sorting" : "" %> <%= ((key || col) == data.sort_col) ? "tableview-sorting-" + data.sort_dir : "" %> <%= col.className || "" %>">
+                    <%= col.header || key %>
+                </th>
+            <% } %>
         <% }) %>
     """
     template: _.template """
@@ -253,12 +255,13 @@ class Backbone.TableView extends Backbone.View
             for model in @collection.models
                 row = $("<tr>")
                 for name, column of @columns
-                    col = $("<td>").addClass(column.className).addClass(column.tdClass)
-                    if column.draw?
-                        col.html column.draw model, @
-                    else
-                        col.text model.get(name) ? ""
-                    row.append col
+                    if not column.noshow
+                        col = $("<td>").addClass(column.className).addClass(column.tdClass)
+                        if column.draw?
+                            col.html column.draw model, @
+                        else
+                            col.text model.get(name) ? ""
+                        row.append col
                 body.append @rowTransformer?(row, model) ? row
         if @pagination
             @refreshPagination()

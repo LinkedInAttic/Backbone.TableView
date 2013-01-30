@@ -91,7 +91,7 @@ Optionally it supports pagination, search, and any number of filters
 
     TableView.prototype.emptyTemplate = _.template("<tr>\n    <td colspan=\"10\"><%= text %></td>\n</tr>");
 
-    TableView.prototype.columnsTemplate = _.template("<% _.each(model, function (col, key) { %>\n    <th abbr=\"<%= key || col %>\"\n     class=\"<%= !col.nosort ? \"tableview-sorting\" : \"\" %> <%= ((key || col) == data.sort_col) ? \"tableview-sorting-\" + data.sort_dir : \"\" %> <%= col.className || \"\" %>\">\n        <%= col.header || key %>\n    </th>\n<% }) %>");
+    TableView.prototype.columnsTemplate = _.template("<% _.each(model, function (col, key) { %>\n    <% if (!col.noshow) { %>\n        <th abbr=\"<%= key || col %>\"\n         class=\"<%= !col.nosort ? \"tableview-sorting\" : \"\" %> <%= ((key || col) == data.sort_col) ? \"tableview-sorting-\" + data.sort_dir : \"\" %> <%= col.className || \"\" %>\">\n            <%= col.header || key %>\n        </th>\n    <% } %>\n<% }) %>");
 
     TableView.prototype.template = _.template("<div class=\"row-fluid\">\n    <%= title %>\n\n    <%= filters %>\n\n    <%= search %>\n</div>\n\n<table class=\"table table-striped tableview-table\">\n    <thead>\n        <tr>\n            <%= columns %>\n        </tr>\n    </thead>\n    <tbody class=\"fade\">\n    </tbody>\n</table>\n\n<div id=\"pagination-main\">\n</div>");
 
@@ -294,13 +294,15 @@ Optionally it supports pagination, search, and any number of filters
           _ref2 = this.columns;
           for (name in _ref2) {
             column = _ref2[name];
-            col = $("<td>").addClass(column.className).addClass(column.tdClass);
-            if (column.draw != null) {
-              col.html(column.draw(model, this));
-            } else {
-              col.text((_ref3 = model.get(name)) != null ? _ref3 : "");
+            if (!column.noshow) {
+              col = $("<td>").addClass(column.className).addClass(column.tdClass);
+              if (column.draw != null) {
+                col.html(column.draw(model, this));
+              } else {
+                col.text((_ref3 = model.get(name)) != null ? _ref3 : "");
+              }
+              row.append(col);
             }
-            row.append(col);
           }
           body.append((_ref4 = typeof this.rowTransformer === "function" ? this.rowTransformer(row, model) : void 0) != null ? _ref4 : row);
         }
