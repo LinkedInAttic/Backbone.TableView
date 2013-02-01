@@ -53,6 +53,12 @@ Optionally it supports pagination, search, and any number of filters
     __extends(TableView, _super);
 
     function TableView() {
+      this.onUpdated = __bind(this.onUpdated, this);
+
+      this.onUpdating = __bind(this.onUpdating, this);
+
+      this.showLoading = __bind(this.showLoading, this);
+
       this.render = __bind(this.render, this);
 
       this.toggleSort = __bind(this.toggleSort, this);
@@ -89,11 +95,11 @@ Optionally it supports pagination, search, and any number of filters
 
     TableView.prototype.paginationTemplate = _.template("<div class=\"row-fluid\">\n    <div class=\"span6\">\n        <div class=\"tableview-info\">Showing <%= from %> to <%= to %><%= total %></div>\n    </div>\n    <div class=\"span6\">\n        <div class=\"pagination tableview-pagination\">\n            <ul>\n                <li class=\"pager-prev <%= prevDisabled %>\"><a href=\"javascript:void(0)\">← Previous</a></li>\n                <% _.each(pages, function (page) { %>\n                    <li class=\"pager-page <%= page.active %>\"><a href=\"javascript:void(0)\"><%= page.number %></a></li>\n                <% }) %>\n                <li class=\"pager-next <%= nextDisabled %>\"><a href=\"javascript:void(0)\">Next → </a></li>\n            </ul>\n        </div>\n    </div>\n</div>");
 
-    TableView.prototype.emptyTemplate = _.template("<tr>\n    <td colspan=\"10\"><%= text %></td>\n</tr>");
+    TableView.prototype.emptyTemplate = _.template("<tr>\n    <td colspan=\"10\"><span class=\"<%= className %>\"><%= text %></span></td>\n</tr>");
 
     TableView.prototype.columnsTemplate = _.template("<% _.each(model, function (col, key) { %>\n    <th abbr=\"<%= key || col %>\"\n     class=\"<%= !col.nosort ? \"tableview-sorting\" : \"\" %> <%= ((key || col) == data.sort_col) ? \"tableview-sorting-\" + data.sort_dir : \"\" %> <%= col.className || \"\" %>\">\n        <%= col.header || key %>\n    </th>\n<% }) %>");
 
-    TableView.prototype.template = _.template("<div class=\"row-fluid\">\n    <%= title %>\n\n    <%= filters %>\n\n    <%= search %>\n</div>\n\n<table class=\"table table-striped tableview-table\">\n    <thead>\n        <tr>\n            <%= columns %>\n        </tr>\n    </thead>\n    <tbody class=\"fade\">\n    </tbody>\n</table>\n\n<div id=\"pagination-main\">\n</div>");
+    TableView.prototype.template = _.template("<div class=\"tableview-container\">\n    <div class=\"loading hide\">\n        <span class=\"tableview-loading-spinner\">Loading...</span>\n    </div>\n    <div class=\"row-fluid\">\n        <%= title %>\n\n        <%= filters %>\n\n        <%= search %>\n    </div>\n\n    <table class=\"table table-striped tableview-table\">\n        <thead>\n            <tr>\n                <%= columns %>\n            </tr>\n        </thead>\n        <tbody class=\"fade\">\n        </tbody>\n    </table>\n\n    <div id=\"pagination-main\">\n    </div>\n</div>");
 
     TableView.prototype.myEvents = {
       "change .search-query": "updateSearch",
@@ -110,6 +116,8 @@ Optionally it supports pagination, search, and any number of filters
       this.collection.on("add", this.renderData);
       this.collection.on("remove", this.renderData);
       this.collection.on("destroy", this.renderData);
+      this.on("updating", this.onUpdating);
+      this.on("updated", this.onUpdated);
       _ref = this.options;
       for (key in _ref) {
         val = _ref[key];
@@ -218,7 +226,6 @@ Optionally it supports pagination, search, and any number of filters
     };
 
     TableView.prototype.update = function(replace, justRender) {
-      this.$("tbody").removeClass("in");
       this.trigger("updating");
       this.updateUrl(replace);
       if (justRender) {
@@ -283,7 +290,8 @@ Optionally it supports pagination, search, and any number of filters
       body = this.$("tbody");
       if (this.collection.models.length === 0) {
         body.html(this.emptyTemplate({
-          text: (_ref = this.empty) != null ? _ref : "No records to show"
+          text: (_ref = this.empty) != null ? _ref : "No records to show",
+          className: ""
         }));
       } else {
         body.html("");
@@ -309,7 +317,6 @@ Optionally it supports pagination, search, and any number of filters
         this.refreshPagination();
       }
       this.trigger("updated");
-      body.addClass("in");
       return this;
     };
 
@@ -393,6 +400,35 @@ Optionally it supports pagination, search, and any number of filters
       return str.charAt(0).toUpperCase() + str.substring(1).replace(/_(\w)/g, function(match, p1) {
         return " " + p1.toUpperCase();
       });
+    };
+
+    TableView.prototype.showLoading = function() {
+      this.showLoadingTimeout = null;
+      this.$("tbody").removeClass("in");
+      if (this.collection.models.length === 0) {
+        this.$(".loading").addClass("hide");
+        return this.$("tbody").html(this.emptyTemplate({
+          text: "Loading...",
+          className: "tableview-loading-spinner"
+        }));
+      } else {
+        return this.$(".loading").removeClass("hide");
+      }
+    };
+
+    TableView.prototype.onUpdating = function() {
+      if (this.showLoadingTimeout) {
+        clearTimeout(this.showLoadingTimeout);
+      }
+      return this.showLoadingTimeout = _.delay(this.showLoading, 500);
+    };
+
+    TableView.prototype.onUpdated = function() {
+      if (this.showLoadingTimeout) {
+        clearTimeout(this.showLoadingTimeout);
+      }
+      this.$("tbody").addClass("in");
+      return this.$(".loading").addClass("hide");
     };
 
     return TableView;
