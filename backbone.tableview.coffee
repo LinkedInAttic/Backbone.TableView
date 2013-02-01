@@ -73,7 +73,7 @@ class Backbone.TableView extends Backbone.View
     """
     emptyTemplate: _.template """
         <tr>
-            <td colspan="10"><%= text %></td>
+            <td colspan="10"><span class="<%= className %>"><%= text %></span></td>
         </tr>
     """
     columnsTemplate: _.template """
@@ -87,25 +87,30 @@ class Backbone.TableView extends Backbone.View
         <% }) %>
     """
     template: _.template """
-        <div class="row-fluid">
-            <%= title %>
+        <div class="tableview-container">
+            <div class="loading hide">
+                <span class="tableview-loading-spinner">Loading...</span>
+            </div>
+            <div class="row-fluid">
+                <%= title %>
 
-            <%= filters %>
+                <%= filters %>
 
-            <%= search %>
-        </div>
+                <%= search %>
+            </div>
 
-        <table class="table table-striped tableview-table">
-            <thead>
-                <tr>
-                    <%= columns %>
-                </tr>
-            </thead>
-            <tbody class="fade">
-            </tbody>
-        </table>
+            <table class="table table-striped tableview-table">
+                <thead>
+                    <tr>
+                        <%= columns %>
+                    </tr>
+                </thead>
+                <tbody class="fade">
+                </tbody>
+            </table>
 
-        <div id="pagination-main">
+            <div id="pagination-main">
+            </div>
         </div>
     """
     myEvents:
@@ -122,6 +127,9 @@ class Backbone.TableView extends Backbone.View
         @collection.on "add", @renderData
         @collection.on "remove", @renderData
         @collection.on "destroy", @renderData
+        @on "updating", @onUpdating
+        @on "updated", @onUpdated
+
         for key, val of @options
             this[key] = val
         @data = _.extend {}, @initialData
@@ -207,7 +215,6 @@ class Backbone.TableView extends Backbone.View
 
     # Update the collection given all the options/filters
     update: (replace, justRender) =>
-        @$("tbody").removeClass("in")
         @trigger "updating"
         @updateUrl replace
         if justRender
@@ -249,7 +256,7 @@ class Backbone.TableView extends Backbone.View
     renderData: =>
         body = @$("tbody")
         if @collection.models.length == 0
-            body.html @emptyTemplate text: @empty ? "No records to show"
+            body.html @emptyTemplate(text: @empty ? "No records to show", className: "")
         else
             body.html ""
             for model in @collection.models
@@ -266,7 +273,6 @@ class Backbone.TableView extends Backbone.View
         if @pagination
             @refreshPagination()
         @trigger "updated"
-        body.addClass("in")
         return @
 
     # Go to a requested page
@@ -333,6 +339,27 @@ class Backbone.TableView extends Backbone.View
     # Helper function to prettify names (eg. hi_world -> Hi World)
     prettyName: (str) ->
         str.charAt(0).toUpperCase() + str.substring(1).replace(/_(\w)/g, (match, p1) -> " " + p1.toUpperCase())
+
+    showLoading: =>
+        @showLoadingTimeout = null
+        @$("tbody").removeClass("in")
+        if @collection.models.length == 0
+            @$(".loading").addClass("hide")
+            @$("tbody").html @emptyTemplate(text: "Loading...", className: "tableview-loading-spinner")
+        else
+            @$(".loading").removeClass("hide")
+
+    onUpdating: =>
+        if @showLoadingTimeout
+            clearTimeout @showLoadingTimeout
+        @showLoadingTimeout = _.delay @showLoading, 500
+
+    onUpdated: =>
+        if @showLoadingTimeout
+            clearTimeout @showLoadingTimeout
+        @$("tbody").addClass("in")
+        @$(".loading").addClass("hide")
+
 
 ###
 Filters
