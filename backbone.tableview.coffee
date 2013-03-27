@@ -451,7 +451,7 @@ class Backbone.TableView.ButtonOptionFilter extends Backbone.TableView.Filter
     update: (e) =>
         @$(".btn").removeClass "active"
         @$(e.currentTarget).addClass "active"
-        @setData @id, e.currentTarget.value
+        @setData @id, @options.get e.currentTarget.value
 
 class Backbone.TableView.DropdownFilter extends Backbone.TableView.Filter
     template: _.template """
@@ -465,4 +465,4 @@ class Backbone.TableView.DropdownFilter extends Backbone.TableView.Filter
         "change .filter": "update"
 
     update: (e) =>
-        @setData @id, e.currentTarget.value
+        @setData @id, @options.get e.currentTarget.value
