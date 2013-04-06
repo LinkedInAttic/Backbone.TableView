@@ -54,11 +54,11 @@ Optionally it supports pagination, search, and any number of filters
 
     function TableView() {
       var _this = this;
-      this.onUpdated = function() {
-        return TableView.prototype.onUpdated.apply(_this, arguments);
+      this.hideLoading = function() {
+        return TableView.prototype.hideLoading.apply(_this, arguments);
       };
-      this.onUpdating = function() {
-        return TableView.prototype.onUpdating.apply(_this, arguments);
+      this.showLoadingNow = function() {
+        return TableView.prototype.showLoadingNow.apply(_this, arguments);
       };
       this.showLoading = function() {
         return TableView.prototype.showLoading.apply(_this, arguments);
@@ -84,10 +84,10 @@ Optionally it supports pagination, search, and any number of filters
       this.refreshPagination = function() {
         return TableView.prototype.refreshPagination.apply(_this, arguments);
       };
-      this.update = function(replace, justRender) {
+      this.update = function(first) {
         return TableView.prototype.update.apply(_this, arguments);
       };
-      this.updateUrl = function(replace) {
+      this.updateUrl = function(first) {
         return TableView.prototype.updateUrl.apply(_this, arguments);
       };
       this.updateSearch = function(e) {
@@ -120,6 +120,10 @@ Optionally it supports pagination, search, and any number of filters
 
     TableView.prototype.template = _.template("<div class=\"tableview-container\">\n    <div class=\"loading hide\">\n        <span class=\"tableview-loading-spinner\">Loading...</span>\n    </div>\n    <div class=\"row-fluid\">\n        <%= title %>\n\n        <%= filters %>\n\n        <%= search %>\n    </div>\n\n    <table class=\"table table-striped tableview-table\">\n        <thead>\n            <tr>\n                <%= columns %>\n            </tr>\n        </thead>\n        <tbody class=\"fade\">\n        </tbody>\n    </table>\n\n    <div id=\"pagination-main\">\n    </div>\n</div>");
 
+    TableView.prototype.pagination = false;
+
+    TableView.prototype.loading = true;
+
     TableView.prototype.myEvents = {
       "change .search-query": "updateSearch",
       "click  th": "toggleSort",
@@ -144,21 +148,31 @@ Optionally it supports pagination, search, and any number of filters
       };
       this.filterClasses = _.extend(myFilters, this.filterClasses);
       this.events = _.extend(_.clone(this.myEvents), this.events);
-      this.collection.on("reset", this.renderData);
-      this.collection.on("add", this.renderData);
-      this.collection.on("remove", this.renderData);
-      this.collection.on("destroy", this.renderData);
-      this.on("updating", this.onUpdating);
-      this.on("updated", this.onUpdated);
       this.data = _.extend({}, this.initialData);
       if (this.router) {
         this.data = _.extend(this.data, this.parseQueryString(Backbone.history.fragment));
+        this.on("updating", this.updateUrl);
       }
       if (this.pagination) {
         this.data.page = (_ref1 = parseInt(this.data.page) || this.page) != null ? _ref1 : 1;
         this.data.size = (_ref2 = parseInt(this.data.size) || this.size) != null ? _ref2 : 10;
+        this.on("updated", this.refreshPagination);
       }
+      if (this.loading) {
+        this.on("updating", this.showLoading);
+        this.on("updated", this.hideLoading);
+      }
+      this.collection.on("reset", this.renderData);
+      this.collection.on("add", this.renderData);
+      this.collection.on("remove", this.renderData);
+      this.collection.on("destroy", this.renderData);
       return this;
+    };
+
+    TableView.prototype.prettyName = function(str) {
+      return str.charAt(0).toUpperCase() + str.substring(1).replace(/_(\w)/g, function(match, p1) {
+        return " " + p1.toUpperCase();
+      });
     };
 
     TableView.prototype.parseQueryString = function(uri) {
@@ -175,6 +189,18 @@ Optionally it supports pagination, search, and any number of filters
         }
       }
       return ret;
+    };
+
+    TableView.prototype.applyTemplate = function(template, model, size) {
+      if (size == null) {
+        size = 12;
+      }
+      return (model && size && template({
+        data: this.data,
+        model: model,
+        classSize: "span" + size,
+        self: this
+      })) || "";
     };
 
     TableView.prototype.setData = function() {
@@ -215,35 +241,30 @@ Optionally it supports pagination, search, and any number of filters
       return this.setData(this.search.query || "q", e.currentTarget.value);
     };
 
-    TableView.prototype.updateUrl = function(replace) {
+    TableView.prototype.updateUrl = function(first) {
       var i, param, uri;
-      if (this.router) {
-        uri = Backbone.history.fragment;
-        if ((i = uri.indexOf("?")) >= 0) {
-          uri = uri.substring(0, i);
-        }
-        param = $.param(this.data);
-        if (param) {
-          uri += "?" + param;
-        }
-        this.router.navigate(uri, {
-          replace: replace
-        });
+      uri = Backbone.history.fragment;
+      if ((i = uri.indexOf("?")) >= 0) {
+        uri = uri.substring(0, i);
       }
+      param = $.param(this.data);
+      if (param) {
+        uri += "?" + param;
+      }
+      this.router.navigate(uri, {
+        replace: first
+      });
       return this;
     };
 
-    TableView.prototype.update = function(replace, justRender) {
-      this.trigger("updating");
-      this.updateUrl(replace);
-      if (justRender) {
+    TableView.prototype.update = function(first) {
+      this.trigger("updating", first);
+      if (first && this.skipInitialFetch) {
         this.renderData();
-      } else {
-        if (!this.noFetch) {
-          this.collection.fetch({
-            data: (typeof this.filterData === "function" ? this.filterData(_.clone(this.data)) : void 0) || this.data
-          });
-        }
+      } else if (!this.noFetch) {
+        this.collection.fetch({
+          data: (typeof this.filterData === "function" ? this.filterData(_.clone(this.data)) : void 0) || this.data
+        });
       }
       return this;
     };
@@ -323,9 +344,6 @@ Optionally it supports pagination, search, and any number of filters
           body.append((_ref4 = typeof this.rowTransformer === "function" ? this.rowTransformer(row, model) : void 0) != null ? _ref4 : row);
         }
       }
-      if (this.pagination) {
-        this.refreshPagination();
-      }
       this.trigger("updated");
       return this;
     };
@@ -361,18 +379,6 @@ Optionally it supports pagination, search, and any number of filters
       return this.setData("sort_col", el.abbr, "sort_dir", sort_dir);
     };
 
-    TableView.prototype.applyTemplate = function(template, model, size) {
-      if (size == null) {
-        size = 12;
-      }
-      return (model && size && template({
-        data: this.data,
-        model: model,
-        classSize: "span" + size,
-        self: this
-      })) || "";
-    };
-
     TableView.prototype.render = function() {
       var filter, filters, filtersDiv, filtersSize, searchSize, titleSize, _i, _len,
         _this = this;
@@ -404,37 +410,34 @@ Optionally it supports pagination, search, and any number of filters
         filter = filters[_i];
         filtersDiv.append(filter.render().el);
       }
-      return this.update(true, this.skipInitialFetch);
-    };
-
-    TableView.prototype.prettyName = function(str) {
-      return str.charAt(0).toUpperCase() + str.substring(1).replace(/_(\w)/g, function(match, p1) {
-        return " " + p1.toUpperCase();
-      });
+      return this.update(true);
     };
 
     TableView.prototype.showLoading = function() {
+      if (this.showLoadingTimeout) {
+        clearTimeout(this.showLoadingTimeout);
+      }
+      return this.showLoadingTimeout = _.delay(this.showLoadingNow, 500);
+    };
+
+    TableView.prototype.showLoadingNow = function() {
+      var body, loading;
       this.showLoadingTimeout = null;
-      this.$("tbody").removeClass("in");
+      body = this.$("tbody");
+      loading = this.$(".loading");
+      body.removeClass("in");
       if (this.collection.models.length === 0) {
-        this.$(".loading").addClass("hide");
-        return this.$("tbody").html(this.emptyTemplate({
+        loading.addClass("hide");
+        return body.html(this.emptyTemplate({
           text: "Loading...",
           className: "tableview-loading-spinner"
         }));
       } else {
-        return this.$(".loading").removeClass("hide");
+        return loading.removeClass("hide");
       }
     };
 
-    TableView.prototype.onUpdating = function() {
-      if (this.showLoadingTimeout) {
-        clearTimeout(this.showLoadingTimeout);
-      }
-      return this.showLoadingTimeout = _.delay(this.showLoading, 500);
-    };
-
-    TableView.prototype.onUpdated = function() {
+    TableView.prototype.hideLoading = function() {
       if (this.showLoadingTimeout) {
         clearTimeout(this.showLoadingTimeout);
       }

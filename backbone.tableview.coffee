@@ -113,6 +113,8 @@ class Backbone.TableView extends Backbone.View
             </div>
         </div>
     """
+    pagination: false
+    loading: true
     myEvents:
         "change .search-query":              "updateSearch"
         "click  th":                         "toggleSort"
@@ -133,21 +135,31 @@ class Backbone.TableView extends Backbone.View
             buttongroup: Backbone.TableView.ButtonGroupFilter
         @filterClasses = _.extend myFilters, @filterClasses
         @events = _.extend _.clone(@myEvents),  @events
-
-        @collection.on "reset", @renderData
-        @collection.on "add", @renderData
-        @collection.on "remove", @renderData
-        @collection.on "destroy", @renderData
-        @on "updating", @onUpdating
-        @on "updated", @onUpdated
-
         @data = _.extend {}, @initialData
+
         if @router
             @data = _.extend(@data, @parseQueryString Backbone.history.fragment)
+            @on "updating", @updateUrl
+
         if @pagination
             @data.page = parseInt(@data.page) or @page ? 1
             @data.size = parseInt(@data.size) or @size ? 10
+            @on "updated", @refreshPagination
+
+        if @loading
+            @on "updating", @showLoading
+            @on "updated",  @hideLoading
+
+        @collection.on "reset",   @renderData
+        @collection.on "add",     @renderData
+        @collection.on "remove",  @renderData
+        @collection.on "destroy", @renderData
+
         return @
+
+    # Helper function to prettify names (eg. hi_world -> Hi World)
+    prettyName: (str) ->
+        str.charAt(0).toUpperCase() + str.substring(1).replace(/_(\w)/g, (match, p1) -> " " + p1.toUpperCase())
 
     # Return a parsed querystring with the "?" (eg. query = "/users?hi=1&bye=hello"
     # would return {hi: "1", bye: "hello"} )
@@ -160,6 +172,12 @@ class Backbone.TableView extends Backbone.View
             while match = search.exec(uri)
                ret[decode(match[1])] = decode(match[2])
         return ret
+
+    # Apply a template to a model and return the result (string), or empty
+    # string if model is false/undefined
+    applyTemplate: (template, model, size) ->
+        if not size? then size = 12
+        (model and size and template data: @data, model: model, classSize: "span" + size, self: @) or ""
 
     # Set data and update collection
     setData: (args...) =>
@@ -193,26 +211,23 @@ class Backbone.TableView extends Backbone.View
         @setData @search.query or "q", e.currentTarget.value
 
     # Navigate to url with all the parameters in data in the querystring
-    updateUrl: (replace) =>
-        if @router
-            uri = Backbone.history.fragment
-            if (i = uri.indexOf "?") >= 0
-                uri = uri.substring 0, i
-            param = $.param @data
-            if param
-                uri += "?" + param
-            @router.navigate uri, replace: replace
+    updateUrl: (first) =>
+        uri = Backbone.history.fragment
+        if (i = uri.indexOf "?") >= 0
+            uri = uri.substring 0, i
+        param = $.param @data
+        if param
+            uri += "?" + param
+        @router.navigate uri, replace: first
         return @
 
     # Update the collection given all the options/filters
-    update: (replace, justRender) =>
-        @trigger "updating"
-        @updateUrl replace
-        if justRender
+    update: (first) =>
+        @trigger "updating", first
+        if first and @skipInitialFetch
             @renderData()
-        else
-            if not @noFetch
-                @collection.fetch data: @filterData?(_.clone(@data)) or @data
+        else if not @noFetch
+            @collection.fetch data: @filterData?(_.clone(@data)) or @data
         return @
 
     # Refresh the pagination div at the bottom
@@ -247,7 +262,7 @@ class Backbone.TableView extends Backbone.View
     renderData: =>
         body = @$("tbody")
         if @collection.models.length == 0
-            body.html @emptyTemplate(text: @empty ? "No records to show", className: "")
+            body.html @emptyTemplate text: @empty ? "No records to show", className: ""
         else
             body.html ""
             for model in @collection.models
@@ -261,8 +276,6 @@ class Backbone.TableView extends Backbone.View
                             col.text model.get(name) ? ""
                         row.append col
                 body.append @rowTransformer?(row, model) ? row
-        if @pagination
-            @refreshPagination()
         @trigger "updated"
         return @
 
@@ -294,12 +307,6 @@ class Backbone.TableView extends Backbone.View
         @$(el).addClass "tableview-sorting-" + sort_dir
         @setData "sort_col", el.abbr, "sort_dir", sort_dir
 
-    # Apply a template to a model and return the result (string), or empty
-    # string if model is false/undefined
-    applyTemplate: (template, model, size) ->
-        if not size? then size = 12
-        (model and size and template data: @data, model: model, classSize: "span" + size, self: @) or ""
-
     # Render skeleton of the table, creating filters and other additions,
     # and trigger an update of the collection
     render: =>
@@ -325,27 +332,29 @@ class Backbone.TableView extends Backbone.View
         filtersDiv = @$(".filters")
         for filter in filters
             filtersDiv.append filter.render().el
-        @update true, @skipInitialFetch
+        @update true
 
-    # Helper function to prettify names (eg. hi_world -> Hi World)
-    prettyName: (str) ->
-        str.charAt(0).toUpperCase() + str.substring(1).replace(/_(\w)/g, (match, p1) -> " " + p1.toUpperCase())
-
+    # Show a loading symbol after a certain delay
     showLoading: =>
-        @showLoadingTimeout = null
-        @$("tbody").removeClass("in")
-        if @collection.models.length == 0
-            @$(".loading").addClass("hide")
-            @$("tbody").html @emptyTemplate(text: "Loading...", className: "tableview-loading-spinner")
-        else
-            @$(".loading").removeClass("hide")
-
-    onUpdating: =>
         if @showLoadingTimeout
             clearTimeout @showLoadingTimeout
-        @showLoadingTimeout = _.delay @showLoading, 500
+        @showLoadingTimeout = _.delay @showLoadingNow, 500
 
-    onUpdated: =>
+    # Show a loading symbol in the middle of the tbody
+    showLoadingNow: =>
+        @showLoadingTimeout = null
+        body = @$("tbody")
+        loading = @$(".loading")
+
+        body.removeClass "in"
+        if @collection.models.length == 0
+            loading.addClass "hide"
+            body.html @emptyTemplate text: "Loading...", className: "tableview-loading-spinner"
+        else
+            loading.removeClass "hide"
+
+    # Hide the loading symbol if it's there
+    hideLoading: =>
         if @showLoadingTimeout
             clearTimeout @showLoadingTimeout
         @$("tbody").addClass("in")
