@@ -129,7 +129,20 @@ Optionally it supports pagination, search, and any number of filters
     };
 
     TableView.prototype.initialize = function() {
-      var key, val, _ref, _ref1, _ref2;
+      var key, myFilters, val, _ref, _ref1, _ref2;
+      _ref = this.options;
+      for (key in _ref) {
+        val = _ref[key];
+        this[key] = val;
+      }
+      myFilters = {
+        option: Backbone.TableView.ButtonOptionFilter,
+        dropdown: Backbone.TableView.DropdownFilter,
+        input: Backbone.TableView.InputFilter,
+        button: Backbone.TableView.ButtonFilter,
+        buttongroup: Backbone.TableView.ButtonGroupFilter
+      };
+      this.filterClasses = _.extend(myFilters, this.filterClasses);
       this.events = _.extend(_.clone(this.myEvents), this.events);
       this.collection.on("reset", this.renderData);
       this.collection.on("add", this.renderData);
@@ -137,11 +150,6 @@ Optionally it supports pagination, search, and any number of filters
       this.collection.on("destroy", this.renderData);
       this.on("updating", this.onUpdating);
       this.on("updated", this.onUpdated);
-      _ref = this.options;
-      for (key in _ref) {
-        val = _ref[key];
-        this[key] = val;
-      }
       this.data = _.extend({}, this.initialData);
       if (this.router) {
         this.data = _.extend(this.data, this.parseQueryString(Backbone.history.fragment));
@@ -187,8 +195,8 @@ Optionally it supports pagination, search, and any number of filters
     };
 
     TableView.prototype.createFilter = function(name, filter) {
-      var options, _ref, _ref1, _ref10, _ref11, _ref12, _ref13, _ref14, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
-      options = {
+      var _ref, _ref1, _ref10, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
+      return new this.filterClasses[filter.type]({
         id: name,
         extraId: filter.extraId,
         name: (_ref = filter.name) != null ? _ref : this.prettyName(name),
@@ -200,26 +208,7 @@ Optionally it supports pagination, search, and any number of filters
         setData: this.setData,
         get: (_ref9 = filter.get) != null ? _ref9 : _.identity,
         getExtraId: (_ref10 = filter.getExtraId) != null ? _ref10 : _.identity
-      };
-      switch (filter.type) {
-        case "option":
-          return new Backbone.TableView.ButtonOptionFilter(options);
-        case "dropdown":
-          return new Backbone.TableView.DropdownFilter(options);
-        case "input":
-          return new Backbone.TableView.InputFilter(options);
-        case "button":
-          if (!options.init) {
-            options.init = (_ref11 = filter.off) != null ? _ref11 : "false";
-          }
-          return new Backbone.TableView.ButtonFilter(options);
-        case "buttongroup":
-          return new Backbone.TableView.ButtonGroupFilter(options);
-        case "custom":
-          filter.setData = this.setData;
-          filter.init = ((_ref14 = filter.set) != null ? _ref14 : _.identity)((_ref12 = (_ref13 = this.data[name]) != null ? _ref13 : filter.init) != null ? _ref12 : "");
-          return filter;
-      }
+      });
     };
 
     TableView.prototype.updateSearch = function(e) {
@@ -564,7 +553,7 @@ Optionally it supports pagination, search, and any number of filters
     ButtonFilter.prototype.initialize = function() {
       ButtonFilter.__super__.initialize.apply(this, arguments);
       this.values = [this.options.off, this.options.on];
-      return this.current = this.options.init === this.options.off ? 0 : 1;
+      return this.current = this.options.init === this.options.on ? 1 : 0;
     };
 
     ButtonFilter.prototype.update = function(e) {

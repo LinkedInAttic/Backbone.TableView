@@ -120,9 +120,20 @@ class Backbone.TableView extends Backbone.View
         "click  .pager-prev:not(.disabled)": "prevPage"
         "click  .pager-next:not(.disabled)": "nextPage"
 
-    # Binds the collection update event for rendering
+    # Parse initial data, hook up to collection's events
     initialize: ->
-        @events = _.extend _.clone(@myEvents), @events
+        for key, val of @options
+            this[key] = val
+
+        myFilters =
+            option:      Backbone.TableView.ButtonOptionFilter
+            dropdown:    Backbone.TableView.DropdownFilter
+            input:       Backbone.TableView.InputFilter
+            button:      Backbone.TableView.ButtonFilter
+            buttongroup: Backbone.TableView.ButtonGroupFilter
+        @filterClasses = _.extend myFilters, @filterClasses
+        @events = _.extend _.clone(@myEvents),  @events
+
         @collection.on "reset", @renderData
         @collection.on "add", @renderData
         @collection.on "remove", @renderData
@@ -130,8 +141,6 @@ class Backbone.TableView extends Backbone.View
         @on "updating", @onUpdating
         @on "updated", @onUpdated
 
-        for key, val of @options
-            this[key] = val
         @data = _.extend {}, @initialData
         if @router
             @data = _.extend(@data, @parseQueryString Backbone.history.fragment)
@@ -166,7 +175,7 @@ class Backbone.TableView extends Backbone.View
 
     # Creates a filter from a filter config definition
     createFilter: (name, filter) =>
-        options =
+        new @filterClasses[filter.type]
             id: name
             extraId: filter.extraId
             name: filter.name ? @prettyName name
@@ -178,24 +187,6 @@ class Backbone.TableView extends Backbone.View
             setData: @setData
             get: filter.get ? _.identity
             getExtraId: filter.getExtraId ? _.identity
-        switch filter.type
-            when "option"
-                return new Backbone.TableView.ButtonOptionFilter options
-            when "dropdown"
-                return new Backbone.TableView.DropdownFilter options
-            when "input"
-                return new Backbone.TableView.InputFilter options
-            when "button"
-                if not options.init
-                    options.init = filter.off ? "false"
-                return new Backbone.TableView.ButtonFilter options
-            when "buttongroup"
-                return new Backbone.TableView.ButtonGroupFilter options
-            when "custom"
-                # For custom filters, we just provide the setData function
-                filter.setData = @setData
-                filter.init = (filter.set ? _.identity) @data[name] ? filter.init ? ""
-                return filter
 
     # Update collection with search query
     updateSearch: (e) =>
@@ -415,7 +406,7 @@ class Backbone.TableView.ButtonFilter extends Backbone.TableView.Filter
     initialize: ->
         super
         @values = [@options.off, @options.on]
-        @current = if @options.init == @options.off then 0 else 1
+        @current = if @options.init == @options.on then 1 else 0
 
     update: (e) =>
         @$(e.currentTarget).toggleClass "active"
