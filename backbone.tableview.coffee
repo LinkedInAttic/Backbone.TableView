@@ -338,7 +338,7 @@ class Backbone.TableView extends Backbone.View
             clearTimeout @showLoadingTimeout
         @showLoadingTimeout = _.delay @showLoadingNow, 500
 
-    # Show a loading symbol in the middle of the tbody
+    # Show a loading symbol in the middle of the table
     showLoadingNow: =>
         @showLoadingTimeout = undefined
         @$("tbody").removeClass "in"
