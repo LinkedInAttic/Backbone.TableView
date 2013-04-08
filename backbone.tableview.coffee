@@ -72,9 +72,7 @@ class Backbone.TableView extends Backbone.View
         </div>
     """
     emptyTemplate: _.template """
-        <tr>
-            <td colspan="10"><span class="<%= className %>"><%= text %></span></td>
-        </tr>
+        <tr><td colspan="10"><%= text %></td></tr>
     """
     columnsTemplate: _.template """
         <% _.each(model, function (col, key) { %>
@@ -88,9 +86,6 @@ class Backbone.TableView extends Backbone.View
     """
     template: _.template """
         <div class="tableview-container">
-            <div class="loading hide">
-                <span class="tableview-loading-spinner">Loading...</span>
-            </div>
             <div class="row-fluid">
                 <%= title %>
 
@@ -99,15 +94,18 @@ class Backbone.TableView extends Backbone.View
                 <%= search %>
             </div>
 
-            <table class="table table-striped tableview-table">
-                <thead>
-                    <tr>
-                        <%= columns %>
-                    </tr>
-                </thead>
-                <tbody class="fade">
-                </tbody>
-            </table>
+            <div class="tableview-table-wrapper">
+                <span class="tableview-loading-spinner hide">Loading...</span>
+                <table class="table table-striped tableview-table">
+                    <thead>
+                        <tr>
+                            <%= columns %>
+                        </tr>
+                    </thead>
+                    <tbody class="fade">
+                    </tbody>
+                </table>
+            </div>
 
             <div id="pagination-main">
             </div>
@@ -262,7 +260,7 @@ class Backbone.TableView extends Backbone.View
     renderData: =>
         body = @$("tbody")
         if @collection.models.length == 0
-            body.html @emptyTemplate text: @empty ? "No records to show", className: ""
+            body.html @emptyTemplate text: @empty ? "No records to show"
         else
             body.html ""
             for model in @collection.models
@@ -342,23 +340,16 @@ class Backbone.TableView extends Backbone.View
 
     # Show a loading symbol in the middle of the tbody
     showLoadingNow: =>
-        @showLoadingTimeout = null
-        body = @$("tbody")
-        loading = @$(".loading")
-
-        body.removeClass "in"
-        if @collection.models.length == 0
-            loading.addClass "hide"
-            body.html @emptyTemplate text: "Loading...", className: "tableview-loading-spinner"
-        else
-            loading.removeClass "hide"
+        @showLoadingTimeout = undefined
+        @$("tbody").removeClass "in"
+        @$(".tableview-loading-spinner").removeClass "hide"
 
     # Hide the loading symbol if it's there
     hideLoading: =>
         if @showLoadingTimeout
             clearTimeout @showLoadingTimeout
-        @$("tbody").addClass("in")
-        @$(".loading").addClass("hide")
+        @$("tbody").addClass "in"
+        @$(".tableview-loading-spinner").addClass "hide"
 
 
 ###

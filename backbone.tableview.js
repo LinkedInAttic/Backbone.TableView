@@ -114,11 +114,11 @@ Optionally it supports pagination, search, and any number of filters
 
     TableView.prototype.paginationTemplate = _.template("<div class=\"row-fluid\">\n    <div class=\"span6\">\n        <div class=\"tableview-info\">Showing <%= from %> to <%= to %><%= total %></div>\n    </div>\n    <div class=\"span6\">\n        <div class=\"pagination tableview-pagination\">\n            <ul>\n                <li class=\"pager-prev <%= prevDisabled %>\"><a href=\"javascript:void(0)\">← Previous</a></li>\n                <% _.each(pages, function (page) { %>\n                    <li class=\"pager-page <%= page.active %>\"><a href=\"javascript:void(0)\"><%= page.number %></a></li>\n                <% }) %>\n                <li class=\"pager-next <%= nextDisabled %>\"><a href=\"javascript:void(0)\">Next → </a></li>\n            </ul>\n        </div>\n    </div>\n</div>");
 
-    TableView.prototype.emptyTemplate = _.template("<tr>\n    <td colspan=\"10\"><span class=\"<%= className %>\"><%= text %></span></td>\n</tr>");
+    TableView.prototype.emptyTemplate = _.template("<tr><td colspan=\"10\"><%= text %></td></tr>");
 
     TableView.prototype.columnsTemplate = _.template("<% _.each(model, function (col, key) { %>\n    <% if (!col.noshow) { %>\n        <th abbr=\"<%= key || col %>\"\n         class=\"<%= !col.nosort && !self.nosort ? \"tableview-sorting\" : \"\" %> <%= ((key || col) == data.sort_col) ? \"tableview-sorting-\" + data.sort_dir : \"\" %> <%= col.className || \"\" %>\">\n            <%= col.header || key %>\n        </th>\n    <% } %>\n<% }) %>");
 
-    TableView.prototype.template = _.template("<div class=\"tableview-container\">\n    <div class=\"loading hide\">\n        <span class=\"tableview-loading-spinner\">Loading...</span>\n    </div>\n    <div class=\"row-fluid\">\n        <%= title %>\n\n        <%= filters %>\n\n        <%= search %>\n    </div>\n\n    <table class=\"table table-striped tableview-table\">\n        <thead>\n            <tr>\n                <%= columns %>\n            </tr>\n        </thead>\n        <tbody class=\"fade\">\n        </tbody>\n    </table>\n\n    <div id=\"pagination-main\">\n    </div>\n</div>");
+    TableView.prototype.template = _.template("<div class=\"tableview-container\">\n    <div class=\"row-fluid\">\n        <%= title %>\n\n        <%= filters %>\n\n        <%= search %>\n    </div>\n\n    <div class=\"tableview-table-wrapper\">\n        <span class=\"tableview-loading-spinner hide\">Loading...</span>\n        <table class=\"table table-striped tableview-table\">\n            <thead>\n                <tr>\n                    <%= columns %>\n                </tr>\n            </thead>\n            <tbody class=\"fade\">\n            </tbody>\n        </table>\n    </div>\n\n    <div id=\"pagination-main\">\n    </div>\n</div>");
 
     TableView.prototype.pagination = false;
 
@@ -319,8 +319,7 @@ Optionally it supports pagination, search, and any number of filters
       body = this.$("tbody");
       if (this.collection.models.length === 0) {
         body.html(this.emptyTemplate({
-          text: (_ref = this.empty) != null ? _ref : "No records to show",
-          className: ""
+          text: (_ref = this.empty) != null ? _ref : "No records to show"
         }));
       } else {
         body.html("");
@@ -421,20 +420,9 @@ Optionally it supports pagination, search, and any number of filters
     };
 
     TableView.prototype.showLoadingNow = function() {
-      var body, loading;
-      this.showLoadingTimeout = null;
-      body = this.$("tbody");
-      loading = this.$(".loading");
-      body.removeClass("in");
-      if (this.collection.models.length === 0) {
-        loading.addClass("hide");
-        return body.html(this.emptyTemplate({
-          text: "Loading...",
-          className: "tableview-loading-spinner"
-        }));
-      } else {
-        return loading.removeClass("hide");
-      }
+      this.showLoadingTimeout = void 0;
+      this.$("tbody").removeClass("in");
+      return this.$(".tableview-loading-spinner").removeClass("hide");
     };
 
     TableView.prototype.hideLoading = function() {
@@ -442,7 +430,7 @@ Optionally it supports pagination, search, and any number of filters
         clearTimeout(this.showLoadingTimeout);
       }
       this.$("tbody").addClass("in");
-      return this.$(".loading").addClass("hide");
+      return this.$(".tableview-loading-spinner").addClass("hide");
     };
 
     return TableView;
