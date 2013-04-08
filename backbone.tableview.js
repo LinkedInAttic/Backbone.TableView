@@ -213,7 +213,7 @@ Optionally it supports pagination, search, and any number of filters
       }
       while (args.length > 1) {
         _ref = args, key = _ref[0], val = _ref[1], args = 3 <= _ref.length ? __slice.call(_ref, 2) : [];
-        if (val != null) {
+        if (val || val === false || val === 0) {
           this.data[key] = val;
         } else {
           delete this.data[key];

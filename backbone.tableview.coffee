@@ -181,7 +181,7 @@ class Backbone.TableView extends Backbone.View
             @data.page = 1
         while args.length > 1
             [key, val, args...] = args
-            if val?
+            if val or val == false or val == 0
                 @data[key] = val
             else
                 delete @data[key]
