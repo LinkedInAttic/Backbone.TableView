@@ -263,7 +263,7 @@ Optionally it supports pagination, search, and any number of filters
       this.trigger("updating", first);
       if (first && this.skipInitialFetch) {
         this.renderData();
-      } else if (!this.fetch) {
+      } else if (this.fetch) {
         this.collection.fetch({
           data: (typeof this.filterData === "function" ? this.filterData(_.clone(this.data)) : void 0) || this.data
         });
