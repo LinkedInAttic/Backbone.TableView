@@ -102,7 +102,7 @@ class Backbone.TableView extends Backbone.View
                             <%= columns %>
                         </tr>
                     </thead>
-                    <tbody class="fade">
+                    <tbody class="fade in">
                     </tbody>
                 </table>
             </div>
