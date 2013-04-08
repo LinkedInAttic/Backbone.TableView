@@ -108,7 +108,7 @@ Optionally it supports pagination, search, and any number of filters
 
     TableView.prototype.titleTemplate = _.template("<div class=\"<%= classSize %>\">\n    <h4 class=\"<%= model.className || \"\" %>\"><%= model.name || model %></h4>\n</div>");
 
-    TableView.prototype.filtersTemplate = _.template("<div class=\"filters controls tableview-center <%= classSize %>\">\n</div>");
+    TableView.prototype.filtersTemplate = _.template("<div class=\"filters controls tableview-center <%= classSize %>\" />");
 
     TableView.prototype.searchTemplate = _.template("<div class=\"<%= classSize %>\">\n    <input type=\"text\" class=\"search-query input-block-level pull-right\" placeholder=\"<%= model.detail || model %>\" value=\"<%- data[model.query || \"q\"] || \"\" %>\"></input>\n</div>");
 
@@ -118,11 +118,13 @@ Optionally it supports pagination, search, and any number of filters
 
     TableView.prototype.columnsTemplate = _.template("<% _.each(model, function (col, key) { %>\n    <% if (!col.noshow) { %>\n        <th abbr=\"<%= key || col %>\"\n         class=\"<%= !col.nosort && !self.nosort ? \"tableview-sorting\" : \"\" %> <%= ((key || col) == data.sort_col) ? \"tableview-sorting-\" + data.sort_dir : \"\" %> <%= col.className || \"\" %>\">\n            <%= col.header || key %>\n        </th>\n    <% } %>\n<% }) %>");
 
-    TableView.prototype.template = _.template("<div class=\"tableview-container\">\n    <div class=\"row-fluid\">\n        <%= title %>\n\n        <%= filters %>\n\n        <%= search %>\n    </div>\n\n    <div class=\"tableview-table-wrapper\">\n        <span class=\"tableview-loading-spinner hide\">Loading...</span>\n        <table class=\"table table-striped tableview-table\">\n            <thead>\n                <tr>\n                    <%= columns %>\n                </tr>\n            </thead>\n            <tbody class=\"fade in\">\n            </tbody>\n        </table>\n    </div>\n\n    <div id=\"pagination-main\">\n    </div>\n</div>");
+    TableView.prototype.template = _.template("<div class=\"tableview-container\">\n    <div class=\"row-fluid\">\n        <%= title %>\n\n        <%= filters %>\n\n        <%= search %>\n    </div>\n\n    <div class=\"tableview-table-wrapper\">\n        <span class=\"tableview-loading-spinner hide\">Loading...</span>\n        <table class=\"table table-striped tableview-table\">\n            <thead>\n                <tr>\n                    <%= columns %>\n                </tr>\n            </thead>\n            <tbody class=\"fade in\" />\n        </table>\n    </div>\n\n    <div id=\"pagination-main\" />\n</div>");
 
     TableView.prototype.pagination = false;
 
     TableView.prototype.loading = true;
+
+    TableView.prototype.fetch = true;
 
     TableView.prototype.myEvents = {
       "change .search-query": "updateSearch",
@@ -261,7 +263,7 @@ Optionally it supports pagination, search, and any number of filters
       this.trigger("updating", first);
       if (first && this.skipInitialFetch) {
         this.renderData();
-      } else if (!this.noFetch) {
+      } else if (!this.fetch) {
         this.collection.fetch({
           data: (typeof this.filterData === "function" ? this.filterData(_.clone(this.data)) : void 0) || this.data
         });

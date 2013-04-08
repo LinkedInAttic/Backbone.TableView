@@ -45,8 +45,7 @@ class Backbone.TableView extends Backbone.View
         </div>
     """
     filtersTemplate: _.template """
-        <div class="filters controls tableview-center <%= classSize %>">
-        </div>
+        <div class="filters controls tableview-center <%= classSize %>" />
     """
     searchTemplate: _.template """
         <div class="<%= classSize %>">
@@ -102,17 +101,16 @@ class Backbone.TableView extends Backbone.View
                             <%= columns %>
                         </tr>
                     </thead>
-                    <tbody class="fade in">
-                    </tbody>
+                    <tbody class="fade in" />
                 </table>
             </div>
 
-            <div id="pagination-main">
-            </div>
+            <div id="pagination-main" />
         </div>
     """
     pagination: false
     loading: true
+    fetch: true
     myEvents:
         "change .search-query":              "updateSearch"
         "click  th":                         "toggleSort"
@@ -224,7 +222,7 @@ class Backbone.TableView extends Backbone.View
         @trigger "updating", first
         if first and @skipInitialFetch
             @renderData()
-        else if not @noFetch
+        else if @fetch
             @collection.fetch data: @filterData?(_.clone(@data)) or @data
         return @
 
