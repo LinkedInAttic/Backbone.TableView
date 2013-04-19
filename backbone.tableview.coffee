@@ -108,6 +108,7 @@ class Backbone.TableView extends Backbone.View
             <div id="pagination-main" />
         </div>
     """
+    search: false
     pagination: false
     loading: true
     fetch: true

@@ -120,6 +120,8 @@ Optionally it supports pagination, search, and any number of filters
 
     TableView.prototype.template = _.template("<div class=\"tableview-container\">\n    <div class=\"row-fluid\">\n        <%= title %>\n\n        <%= filters %>\n\n        <%= search %>\n    </div>\n\n    <div class=\"tableview-table-wrapper\">\n        <span class=\"tableview-loading-spinner hide\">Loading...</span>\n        <table class=\"table table-striped tableview-table\">\n            <thead>\n                <tr>\n                    <%= columns %>\n                </tr>\n            </thead>\n            <tbody class=\"fade in\" />\n        </table>\n    </div>\n\n    <div id=\"pagination-main\" />\n</div>");
 
+    TableView.prototype.search = false;
+
     TableView.prototype.pagination = false;
 
     TableView.prototype.loading = true;
@@ -571,7 +573,7 @@ Optionally it supports pagination, search, and any number of filters
       return ButtonGroupFilter.__super__.constructor.apply(this, arguments);
     }
 
-    ButtonGroupFilter.prototype.template = _.template("<% _.each(options, function (el, i) { %>\n    <button class=\"btn <%= _.contains(init, el.value) ? \"active\" : \"\" %> <%= !_.isUndefined(el.className) ? el.className : \"\" %>\" value=\"<%= el.value %>\"><%= el.name %></button>\n<% }) %>");
+    ButtonGroupFilter.prototype.template = _.template("<% _.each(options, function (el, i) { %>\n    <button type=\"button\" class=\"btn <%= _.contains(init, el.value) ? \"active\" : \"\" %> <%= !_.isUndefined(el.className) ? el.className : \"\" %>\" value=\"<%= el.value %>\"><%= el.name %></button>\n<% }) %>");
 
     ButtonGroupFilter.prototype.className = "btn-group pull-left tableview-filterbox";
 
@@ -609,7 +611,7 @@ Optionally it supports pagination, search, and any number of filters
       return ButtonOptionFilter.__super__.constructor.apply(this, arguments);
     }
 
-    ButtonOptionFilter.prototype.template = _.template("<% _.each(options, function (el, i) { %>\n    <button class=\"btn <%= init == el.value ? \"active\" : \"\" %>\" value=\"<%= el.value %>\"><%= el.name %></button>\n<% }) %>");
+    ButtonOptionFilter.prototype.template = _.template("<% _.each(options, function (el, i) { %>\n    <button type=\"button\" class=\"btn <%= init == el.value ? \"active\" : \"\" %>\" value=\"<%= el.value %>\"><%= el.name %></button>\n<% }) %>");
 
     ButtonOptionFilter.prototype.className = "btn-group pull-left tableview-filterbox";
 
@@ -639,7 +641,7 @@ Optionally it supports pagination, search, and any number of filters
       return DropdownFilter.__super__.constructor.apply(this, arguments);
     }
 
-    DropdownFilter.prototype.template = _.template("<select class=\"filter <%= filterClass %>\">\n    <% _.each(options, function (el, i) { %>\n        <option <%= init == el.value ? \"selected='selected'\" : \"\" %> value=\"<%= el.value %>\"><%= el.name %></button>\n    <% }) %>\n</select>");
+    DropdownFilter.prototype.template = _.template("<select class=\"filter <%= filterClass %>\">\n    <% _.each(options, function (el, i) { %>\n        <option <%= init == el.value ? \"selected='selected'\" : \"\" %> value=\"<%= el.value %>\"><%= el.name %></option>\n    <% }) %>\n</select>");
 
     DropdownFilter.prototype.events = {
       "change .filter": "update"
