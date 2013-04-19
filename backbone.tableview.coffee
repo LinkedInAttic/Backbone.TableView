@@ -414,7 +414,7 @@ class Backbone.TableView.ButtonFilter extends Backbone.TableView.Filter
 class Backbone.TableView.ButtonGroupFilter extends Backbone.TableView.Filter
     template: _.template """
         <% _.each(options, function (el, i) { %>
-            <button class="btn <%= _.contains(init, el.value) ? "active" : "" %> <%= !_.isUndefined(el.className) ? el.className : "" %>" value="<%= el.value %>"><%= el.name %></button>
+            <button type="button" class="btn <%= _.contains(init, el.value) ? "active" : "" %> <%= !_.isUndefined(el.className) ? el.className : "" %>" value="<%= el.value %>"><%= el.name %></button>
         <% }) %>
     """
     className: "btn-group pull-left tableview-filterbox"
@@ -430,7 +430,7 @@ class Backbone.TableView.ButtonGroupFilter extends Backbone.TableView.Filter
 class Backbone.TableView.ButtonOptionFilter extends Backbone.TableView.Filter
     template: _.template """
         <% _.each(options, function (el, i) { %>
-            <button class="btn <%= init == el.value ? "active" : "" %>" value="<%= el.value %>"><%= el.name %></button>
+            <button type="button" class="btn <%= init == el.value ? "active" : "" %>" value="<%= el.value %>"><%= el.name %></button>
         <% }) %>
     """
     className: "btn-group pull-left tableview-filterbox"
@@ -446,7 +446,7 @@ class Backbone.TableView.DropdownFilter extends Backbone.TableView.Filter
     template: _.template """
         <select class="filter <%= filterClass %>">
             <% _.each(options, function (el, i) { %>
-                <option <%= init == el.value ? "selected='selected'" : "" %> value="<%= el.value %>"><%= el.name %></button>
+                <option <%= init == el.value ? "selected='selected'" : "" %> value="<%= el.value %>"><%= el.name %></option>
             <% }) %>
         </select>
     """
