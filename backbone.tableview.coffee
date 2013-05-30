@@ -54,17 +54,25 @@ class Backbone.TableView extends Backbone.View
     """
     paginationTemplate: _.template """
         <div class="row-fluid">
-            <div class="span6">
+            <div class="span3">
                 <div class="tableview-info">Showing <%= from %> to <%= to %><%= total %></div>
             </div>
-            <div class="span6">
+            <div class="span9">
                 <div class="pagination tableview-pagination">
                     <ul>
                         <li class="pager-prev <%= prevDisabled %>"><a href="javascript:void(0)">← Previous</a></li>
                         <% _.each(pages, function (page) { %>
-                            <li class="pager-page <%= page.active %>"><a href="javascript:void(0)"><%= page.number %></a></li>
+                            <li class="pager-page <%= page.active %>"><a href="javascript:void(0)"><%= page.value %></a></li>
                         <% }) %>
                         <li class="pager-next <%= nextDisabled %>"><a href="javascript:void(0)">Next → </a></li>
+                    </ul>
+                </div>
+                <div class="pagination tableview-size">
+                    <ul>
+                        <li class="disabled"><a>Page Size</a></li>
+                        <% _.each(sizes, function (size) { %>
+                            <li class="pager-size <%= size.active %>"><a href="javascript:void(0)"><%= size.value %></a></li>
+                        <% }) %>
                     </ul>
                 </div>
             </div>
@@ -115,6 +123,7 @@ class Backbone.TableView extends Backbone.View
     myEvents:
         "change .search-query":              "updateSearch"
         "click  th":                         "toggleSort"
+        "click  .pager-size:not(.active)":   "changeSize"
         "click  .pager-page:not(.active)":   "toPage"
         "click  .pager-prev:not(.disabled)": "prevPage"
         "click  .pager-next:not(.disabled)": "nextPage"
@@ -245,7 +254,8 @@ class Backbone.TableView extends Backbone.View
             pageFrom = _.max [1, @data.page - 2 - _.max [0, 2 + @data.page - maxPage]]
             pageTo   = _.min [maxPage, @data.page + 2 + _.max [0, 3 - @data.page]]
             total    = " of " + max + " entries"
-        pages = ({number: i, active: (i == @data.page and "active") or ""} for i in _.range pageFrom, pageTo + 1)
+        pages = ({value: i, active: (i == @data.page and "active") or ""} for i in _.range pageFrom, pageTo + 1)
+        sizes = ({value: i, active: (i == @data.size and "active") or ""} for i in [10, 20, 50, 200])
         @$("#pagination-main").html @paginationTemplate
             from: from
             to: to
@@ -253,6 +263,7 @@ class Backbone.TableView extends Backbone.View
             prevDisabled: if @data.page == 1 then "disabled" else ""
             nextDisabled: if to == max then "disabled" else ""
             pages: pages
+            sizes: sizes
         return @
 
     # Render the collection in the tbody section of the table
@@ -275,6 +286,10 @@ class Backbone.TableView extends Backbone.View
                 body.append @rowTransformer?(row, model) ? row
         @trigger "updated"
         return @
+
+    # Set requested page size
+    changeSize: (e) =>
+        @setData "size", parseInt e.currentTarget.childNodes[0].text
 
     # Go to a requested page
     toPage: (e) =>

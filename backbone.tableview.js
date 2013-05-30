@@ -78,6 +78,9 @@ Optionally it supports pagination, search, and any number of filters
       this.toPage = function(e) {
         return TableView.prototype.toPage.apply(_this, arguments);
       };
+      this.changeSize = function(e) {
+        return TableView.prototype.changeSize.apply(_this, arguments);
+      };
       this.renderData = function() {
         return TableView.prototype.renderData.apply(_this, arguments);
       };
@@ -112,7 +115,7 @@ Optionally it supports pagination, search, and any number of filters
 
     TableView.prototype.searchTemplate = _.template("<div class=\"<%= classSize %>\">\n    <input type=\"text\" class=\"search-query input-block-level pull-right\" placeholder=\"<%= model.detail || model %>\" value=\"<%- data[model.query || \"q\"] || \"\" %>\"></input>\n</div>");
 
-    TableView.prototype.paginationTemplate = _.template("<div class=\"row-fluid\">\n    <div class=\"span6\">\n        <div class=\"tableview-info\">Showing <%= from %> to <%= to %><%= total %></div>\n    </div>\n    <div class=\"span6\">\n        <div class=\"pagination tableview-pagination\">\n            <ul>\n                <li class=\"pager-prev <%= prevDisabled %>\"><a href=\"javascript:void(0)\">← Previous</a></li>\n                <% _.each(pages, function (page) { %>\n                    <li class=\"pager-page <%= page.active %>\"><a href=\"javascript:void(0)\"><%= page.number %></a></li>\n                <% }) %>\n                <li class=\"pager-next <%= nextDisabled %>\"><a href=\"javascript:void(0)\">Next → </a></li>\n            </ul>\n        </div>\n    </div>\n</div>");
+    TableView.prototype.paginationTemplate = _.template("<div class=\"row-fluid\">\n    <div class=\"span3\">\n        <div class=\"tableview-info\">Showing <%= from %> to <%= to %><%= total %></div>\n    </div>\n    <div class=\"span9\">\n        <div class=\"pagination tableview-pagination\">\n            <ul>\n                <li class=\"pager-prev <%= prevDisabled %>\"><a href=\"javascript:void(0)\">← Previous</a></li>\n                <% _.each(pages, function (page) { %>\n                    <li class=\"pager-page <%= page.active %>\"><a href=\"javascript:void(0)\"><%= page.value %></a></li>\n                <% }) %>\n                <li class=\"pager-next <%= nextDisabled %>\"><a href=\"javascript:void(0)\">Next → </a></li>\n            </ul>\n        </div>\n        <div class=\"pagination tableview-size\">\n            <ul>\n                <li class=\"disabled\"><a>Page Size</a></li>\n                <% _.each(sizes, function (size) { %>\n                    <li class=\"pager-size <%= size.active %>\"><a href=\"javascript:void(0)\"><%= size.value %></a></li>\n                <% }) %>\n            </ul>\n        </div>\n    </div>\n</div>");
 
     TableView.prototype.emptyTemplate = _.template("<tr><td colspan=\"10\"><%= text %></td></tr>");
 
@@ -131,6 +134,7 @@ Optionally it supports pagination, search, and any number of filters
     TableView.prototype.myEvents = {
       "change .search-query": "updateSearch",
       "click  th": "toggleSort",
+      "click  .pager-size:not(.active)": "changeSize",
       "click  .pager-page:not(.active)": "toPage",
       "click  .pager-prev:not(.disabled)": "prevPage",
       "click  .pager-next:not(.disabled)": "nextPage"
@@ -274,7 +278,7 @@ Optionally it supports pagination, search, and any number of filters
     };
 
     TableView.prototype.refreshPagination = function() {
-      var from, i, max, maxPage, pageFrom, pageTo, pages, to, total, _base, _base1;
+      var from, i, max, maxPage, pageFrom, pageTo, pages, sizes, to, total, _base, _base1;
       this.data.page = parseInt(typeof (_base = this.collection).getData === "function" ? _base.getData("page") : void 0) || this.data.page;
       this.data.size = parseInt(typeof (_base1 = this.collection).getData === "function" ? _base1.getData("size") : void 0) || this.data.size;
       from = (this.data.page - 1) * this.data.size;
@@ -301,8 +305,21 @@ Optionally it supports pagination, search, and any number of filters
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           i = _ref[_i];
           _results.push({
-            number: i,
+            value: i,
             active: (i === this.data.page && "active") || ""
+          });
+        }
+        return _results;
+      }).call(this);
+      sizes = (function() {
+        var _i, _len, _ref, _results;
+        _ref = [10, 20, 50, 200];
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          i = _ref[_i];
+          _results.push({
+            value: i,
+            active: (i === this.data.size && "active") || ""
           });
         }
         return _results;
@@ -313,7 +330,8 @@ Optionally it supports pagination, search, and any number of filters
         total: total,
         prevDisabled: this.data.page === 1 ? "disabled" : "",
         nextDisabled: to === max ? "disabled" : "",
-        pages: pages
+        pages: pages,
+        sizes: sizes
       }));
       return this;
     };
@@ -349,6 +367,10 @@ Optionally it supports pagination, search, and any number of filters
       }
       this.trigger("updated");
       return this;
+    };
+
+    TableView.prototype.changeSize = function(e) {
+      return this.setData("size", parseInt(e.currentTarget.childNodes[0].text));
     };
 
     TableView.prototype.toPage = function(e) {

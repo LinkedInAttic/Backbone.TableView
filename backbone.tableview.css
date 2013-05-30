@@ -7,6 +7,12 @@ div.tableview-pagination {
     margin: 0;
 }
 
+.tableview-size {
+    padding-right: 10px;
+    float: right;
+    margin: 0;
+}
+
 .tableview-table-wrapper {
     min-height: 68px;
     position: relative;
