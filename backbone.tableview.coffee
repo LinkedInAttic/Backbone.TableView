@@ -69,7 +69,7 @@ class Backbone.TableView extends Backbone.View
                 </div>
                 <div class="pagination tableview-size">
                     <ul>
-                        <li class="disabled"><a>Page Size</a></li>
+                        <li class="disabled"><a>Size</a></li>
                         <% _.each(sizes, function (size) { %>
                             <li class="pager-size <%= size.active %>"><a href="javascript:void(0)"><%= size.value %></a></li>
                         <% }) %>
