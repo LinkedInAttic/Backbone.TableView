@@ -410,7 +410,7 @@ Optionally it supports pagination, search, and any number of filters
       titleSize = 3;
       filtersSize = 6;
       searchSize = 3;
-      if (this.search == null) {
+      if (!this.search) {
         filtersSize += searchSize;
         searchSize = 0;
       }

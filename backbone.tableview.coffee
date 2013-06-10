@@ -325,7 +325,7 @@ class Backbone.TableView extends Backbone.View
         titleSize = 3
         filtersSize = 6
         searchSize = 3
-        if not @search?
+        if not @search
             filtersSize += searchSize
             searchSize = 0
         if not @title?
