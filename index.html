@@ -1,0 +1,116 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Backbone.TableView by linkedin</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/linkedin/Backbone.TableView">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/linkedin/Backbone.TableView/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/linkedin/Backbone.TableView/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
+
+    <div class="wrapper">
+
+      <section>
+        <div id="title">
+          <h1>Backbone.TableView</h1>
+          <p>Backbone view to render collections as tables</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/linkedin">linkedin</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
+        </div>
+
+        <h1>
+<a name="backbonetableview" class="anchor" href="#backbonetableview"><span class="octicon octicon-link"></span></a>Backbone.TableView</h1>
+
+<p>Backbone View to render collections as tables. Currently it is targeted at
+bootstrap users, in the future it will be more css agnostic.</p>
+
+<h2>
+<a name="how-to-use" class="anchor" href="#how-to-use"><span class="octicon octicon-link"></span></a>How To Use</h2>
+
+<p>Subclass TableView and add column definitions. Optionaly
+you can add a title, a search bar, pagination, and any number
+of filters (see supported filters below):</p>
+
+<pre><code>class UserTableView extends Backbone.TableView
+    title: "My Users Table"
+    columns:
+        name:
+            header: "My Name"
+        type:
+            header: "Type"
+        last_login:
+            header: "Last Login Time"
+            draw: (model) -&gt;
+                new Date(model.get "time")
+    pagination: true
+    search:
+        query: "name"
+        detail: "Search by Name"
+    filters:
+        from:
+            type: "input"
+            className: "date"
+            init: new Date()
+            get: (val) -&gt;
+                ... process the date val ...
+        my_button:
+            type: "button"
+        status:
+            type: "option"
+            options: ["all", "valid", "invalid"]
+</code></pre>
+
+<p>Use it as any other Backbone View, either setting the "el" property at
+creation, or letting backbone create if for you, eg (Users is a regular
+backbone collection):</p>
+
+<pre><code>user_table = new UserTableView collection: new Users()
+$("#somewhere").html user_table.render().el
+</code></pre>
+
+<h2>
+<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h2>
+
+<p>Apache Public License (APL) 2.0</p>
+
+<h2>
+<a name="author" class="anchor" href="#author"><span class="octicon octicon-link"></span></a>Author</h2>
+
+<p>Juan Pablo Bottaro - <a href="https://github.com/jpbottaro">https://github.com/jpbottaro</a></p>
+
+<h2>
+<a name="demo" class="anchor" href="#demo"><span class="octicon octicon-link"></span></a>Demo</h2>
+
+<p><a href="http://jsfiddle.net/jpbottaro/u7zQT/">http://jsfiddle.net/jpbottaro/u7zQT/</a></p>
+
+<h2>
+<a name="thanks" class="anchor" href="#thanks"><span class="octicon octicon-link"></span></a>Thanks</h2>
+
+<p>This was initialy inspired by the project <a href="https://github.com/jsvine/Backbone.Table">https://github.com/jsvine/Backbone.Table</a></p>
+      </section>
+
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
