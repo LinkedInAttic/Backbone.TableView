@@ -140,7 +140,7 @@ class Backbone.TableView extends Backbone.View
             button:      Backbone.TableView.ButtonFilter
             buttongroup: Backbone.TableView.ButtonGroupFilter
         @filterClasses = _.extend myFilters, @filterClasses
-        @events = _.extend _.clone(@myEvents),  @events
+        @events = _.extend _.clone(@myEvents), @events
         @data = _.extend {}, @initialData
 
         if @router
@@ -153,13 +153,10 @@ class Backbone.TableView extends Backbone.View
             @on "updated", @refreshPagination
 
         if @loading
-            @on "updating", @showLoading
-            @on "updated",  @hideLoading
+            @listenTo @collection, "request", @showLoading
+            @on "updated", @hideLoading
 
-        @collection.on "reset",   @renderData
-        @collection.on "add",     @renderData
-        @collection.on "remove",  @renderData
-        @collection.on "destroy", @renderData
+        @listenTo @collection, "sync", @renderData
 
         return @
 
