@@ -78,15 +78,15 @@ Optionally it supports pagination, search, and any number of filters
 
     TableView.prototype.filtersTemplate = _.template("<div class=\"filters controls tableview-center <%= classSize %>\" />");
 
-    TableView.prototype.searchTemplate = _.template("<div class=\"<%= classSize %>\">\n    <input type=\"text\" class=\"search-query input-block-level pull-right\" placeholder=\"<%= model.detail || model %>\" value=\"<%- data[model.query || \"q\"] || \"\" %>\"></input>\n</div>");
+    TableView.prototype.searchTemplate = _.template("<div class=\"<%= classSize %> form-group\">\n    <input type=\"text\" class=\"search-query form-control input-block-level pull-right\" placeholder=\"<%= model.detail || model %>\" value=\"<%- data[model.query || \"q\"] || \"\" %>\"></input>\n</div>");
 
-    TableView.prototype.paginationTemplate = _.template("<div class=\"row-fluid\">\n    <div class=\"span3\">\n        <div class=\"tableview-info\">Showing <%= from %> to <%= to %><%= total %></div>\n    </div>\n    <div class=\"span9\">\n        <div class=\"pagination tableview-pagination\">\n            <ul>\n                <li class=\"pager-prev <%= prevDisabled %>\"><a href=\"javascript:void(0)\">← Previous</a></li>\n                <% _.each(pages, function (page) { %>\n                    <li class=\"pager-page <%= page.active %>\"><a href=\"javascript:void(0)\"><%= page.value %></a></li>\n                <% }) %>\n                <li class=\"pager-next <%= nextDisabled %>\"><a href=\"javascript:void(0)\">Next → </a></li>\n            </ul>\n        </div>\n        <div class=\"pagination tableview-size\">\n            <ul>\n                <li class=\"disabled\"><a>Size</a></li>\n                <% _.each(sizes, function (size) { %>\n                    <li class=\"pager-size <%= size.active %>\"><a href=\"javascript:void(0)\"><%= size.value %></a></li>\n                <% }) %>\n            </ul>\n        </div>\n    </div>\n</div>");
+    TableView.prototype.paginationTemplate = _.template("<div class=\"row\">\n    <div class=\"span3 col-lg-3\">\n        <div class=\"tableview-info\">Showing <%= from %> to <%= to %><%= total %></div>\n    </div>\n    <div class=\"span9 col-lg-9\">\n        <div class=\"pagination tableview-pagination\">\n            <ul class=\"pagination\">\n                <li class=\"pager-prev <%= prevDisabled %>\"><a href=\"javascript:void(0)\">← Previous</a></li>\n                <% _.each(pages, function (page) { %>\n                    <li class=\"pager-page <%= page.active %>\"><a href=\"javascript:void(0)\"><%= page.value %></a></li>\n                <% }) %>\n                <li class=\"pager-next <%= nextDisabled %>\"><a href=\"javascript:void(0)\">Next → </a></li>\n            </ul>\n        </div>\n        <div class=\"pagination tableview-size\">\n            <ul class=\"pagination\">\n                <li class=\"disabled\"><a>Size</a></li>\n                <% _.each(sizes, function (size) { %>\n                    <li class=\"pager-size <%= size.active %>\"><a href=\"javascript:void(0)\"><%= size.value %></a></li>\n                <% }) %>\n            </ul>\n        </div>\n    </div>\n</div>");
 
     TableView.prototype.emptyTemplate = _.template("<tr><td colspan=\"10\"><%= text %></td></tr>");
 
     TableView.prototype.columnsTemplate = _.template("<% _.each(model, function (col, key) { %>\n    <% if (!col.noshow) { %>\n        <th abbr=\"<%= key || col %>\"\n         class=\"<%= !col.nosort && !self.nosort ? \"tableview-sorting\" : \"\" %> <%= ((key || col) == data.sort_col) ? \"tableview-sorting-\" + data.sort_dir : \"\" %> <%= col.className || \"\" %>\">\n            <%= col.header || key %>\n        </th>\n    <% } %>\n<% }) %>");
 
-    TableView.prototype.template = _.template("<div class=\"tableview-container\">\n    <div class=\"row-fluid\">\n        <%= title %>\n\n        <%= filters %>\n\n        <%= search %>\n    </div>\n\n    <div class=\"tableview-table-wrapper\">\n        <span class=\"tableview-loading-spinner hide\">Loading...</span>\n        <table class=\"table table-striped tableview-table\">\n            <thead>\n                <tr>\n                    <%= columns %>\n                </tr>\n            </thead>\n            <tbody class=\"fade in\" />\n        </table>\n    </div>\n\n    <div id=\"pagination-main\" />\n</div>");
+    TableView.prototype.template = _.template("<div class=\"tableview-container\">\n    <div class=\"row\">\n        <%= title %>\n\n        <%= filters %>\n\n        <%= search %>\n    </div>\n\n    <div class=\"tableview-table-wrapper\">\n        <span class=\"tableview-loading-spinner hide\">Loading...</span>\n        <table class=\"table table-striped tableview-table\">\n            <thead>\n                <tr>\n                    <%= columns %>\n                </tr>\n            </thead>\n            <tbody class=\"fade in\" />\n        </table>\n    </div>\n\n    <div id=\"pagination-main\" />\n</div>");
 
     TableView.prototype.search = false;
 
@@ -168,7 +168,7 @@ Optionally it supports pagination, search, and any number of filters
       return (model && size && template({
         data: this.data,
         model: model,
-        classSize: "span" + size,
+        classSize: "span" + size + " col-lg-" + size,
         self: this
       })) || "";
     };
@@ -485,9 +485,9 @@ Optionally it supports pagination, search, and any number of filters
       return _ref2;
     }
 
-    InputFilter.prototype.template = _.template("<span class=\"add-on\"><%= name %></span><input type=\"text\" class=\"filter <%= filterClass %>\" value=\"<%= init %>\"></input>");
+    InputFilter.prototype.template = _.template("<span class=\"input-group-addon add-on\"><%= name %></span><input type=\"text\" class=\"form-control filter <%= filterClass %>\" value=\"<%= init %>\"></input>");
 
-    InputFilter.prototype.className = "input-prepend pull-left tableview-filterbox";
+    InputFilter.prototype.className = "input-group col-lg-3 input-prepend pull-left tableview-filterbox";
 
     InputFilter.prototype.events = {
       "change .filter": "update"
@@ -607,7 +607,7 @@ Optionally it supports pagination, search, and any number of filters
       return _ref6;
     }
 
-    DropdownFilter.prototype.template = _.template("<select class=\"filter <%= filterClass %>\">\n    <% _.each(options, function (el, i) { %>\n        <option <%= init == el.value ? \"selected='selected'\" : \"\" %> value=\"<%= el.value %>\"><%= el.name %></option>\n    <% }) %>\n</select>");
+    DropdownFilter.prototype.template = _.template("<select class=\"form-control filter <%= filterClass %>\">\n    <% _.each(options, function (el, i) { %>\n        <option <%= init == el.value ? \"selected='selected'\" : \"\" %> value=\"<%= el.value %>\"><%= el.name %></option>\n    <% }) %>\n</select>");
 
     DropdownFilter.prototype.events = {
       "change .filter": "update"

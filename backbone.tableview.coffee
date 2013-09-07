@@ -48,18 +48,18 @@ class Backbone.TableView extends Backbone.View
         <div class="filters controls tableview-center <%= classSize %>" />
     """
     searchTemplate: _.template """
-        <div class="<%= classSize %>">
-            <input type="text" class="search-query input-block-level pull-right" placeholder="<%= model.detail || model %>" value="<%- data[model.query || "q"] || "" %>"></input>
+        <div class="<%= classSize %> form-group">
+            <input type="text" class="search-query form-control input-block-level pull-right" placeholder="<%= model.detail || model %>" value="<%- data[model.query || "q"] || "" %>"></input>
         </div>
     """
     paginationTemplate: _.template """
-        <div class="row-fluid">
-            <div class="span3">
+        <div class="row">
+            <div class="span3 col-lg-3">
                 <div class="tableview-info">Showing <%= from %> to <%= to %><%= total %></div>
             </div>
-            <div class="span9">
+            <div class="span9 col-lg-9">
                 <div class="pagination tableview-pagination">
-                    <ul>
+                    <ul class="pagination">
                         <li class="pager-prev <%= prevDisabled %>"><a href="javascript:void(0)">← Previous</a></li>
                         <% _.each(pages, function (page) { %>
                             <li class="pager-page <%= page.active %>"><a href="javascript:void(0)"><%= page.value %></a></li>
@@ -68,7 +68,7 @@ class Backbone.TableView extends Backbone.View
                     </ul>
                 </div>
                 <div class="pagination tableview-size">
-                    <ul>
+                    <ul class="pagination">
                         <li class="disabled"><a>Size</a></li>
                         <% _.each(sizes, function (size) { %>
                             <li class="pager-size <%= size.active %>"><a href="javascript:void(0)"><%= size.value %></a></li>
@@ -93,7 +93,7 @@ class Backbone.TableView extends Backbone.View
     """
     template: _.template """
         <div class="tableview-container">
-            <div class="row-fluid">
+            <div class="row">
                 <%= title %>
 
                 <%= filters %>
@@ -180,7 +180,7 @@ class Backbone.TableView extends Backbone.View
     # string if model is false/undefined
     applyTemplate: (template, model, size) ->
         if not size? then size = 12
-        (model and size and template data: @data, model: model, classSize: "span" + size, self: @) or ""
+        (model and size and template data: @data, model: model, classSize: "span" + size + " col-lg-" + size, self: @) or ""
 
     # Set data and update collection
     setData: (args...) =>
@@ -395,9 +395,9 @@ class Backbone.TableView.Filter extends Backbone.View
 
 class Backbone.TableView.InputFilter extends Backbone.TableView.Filter
     template: _.template """
-        <span class="add-on"><%= name %></span><input type="text" class="filter <%= filterClass %>" value="<%= init %>"></input>
+        <span class="input-group-addon add-on"><%= name %></span><input type="text" class="form-control filter <%= filterClass %>" value="<%= init %>"></input>
     """
-    className: "input-prepend pull-left tableview-filterbox"
+    className: "input-group col-lg-3 input-prepend pull-left tableview-filterbox"
     events:
         "change .filter": "update"
 
@@ -457,7 +457,7 @@ class Backbone.TableView.ButtonOptionFilter extends Backbone.TableView.Filter
 
 class Backbone.TableView.DropdownFilter extends Backbone.TableView.Filter
     template: _.template """
-        <select class="filter <%= filterClass %>">
+        <select class="form-control filter <%= filterClass %>">
             <% _.each(options, function (el, i) { %>
                 <option <%= init == el.value ? "selected='selected'" : "" %> value="<%= el.value %>"><%= el.name %></option>
             <% }) %>
