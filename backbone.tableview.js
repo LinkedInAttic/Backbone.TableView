@@ -133,7 +133,7 @@ Optionally it supports pagination, search, and any number of filters
       }
       if (this.loading) {
         this.listenTo(this.collection, "request", this.showLoading);
-        this.on("updated", this.hideLoading);
+        this.listenTo(this.collection, "sync", this.hideLoading);
       }
       this.listenTo(this.collection, "sync", this.renderData);
       return this;

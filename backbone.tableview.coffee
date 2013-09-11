@@ -154,7 +154,7 @@ class Backbone.TableView extends Backbone.View
 
         if @loading
             @listenTo @collection, "request", @showLoading
-            @on "updated", @hideLoading
+            @listenTo @collection, "sync", @hideLoading
 
         @listenTo @collection, "sync", @renderData
 
