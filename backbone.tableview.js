@@ -105,11 +105,10 @@ Optionally it supports pagination, search, and any number of filters
       "click  .pager-next:not(.disabled)": "nextPage"
     };
 
-    TableView.prototype.initialize = function() {
-      var key, myFilters, val, _ref1, _ref2, _ref3;
-      _ref1 = this.options;
-      for (key in _ref1) {
-        val = _ref1[key];
+    TableView.prototype.initialize = function(options) {
+      var key, myFilters, val, _ref1, _ref2;
+      for (key in options) {
+        val = options[key];
         this[key] = val;
       }
       myFilters = {
@@ -127,8 +126,8 @@ Optionally it supports pagination, search, and any number of filters
         this.on("updating", this.updateUrl);
       }
       if (this.pagination) {
-        this.data.page = (_ref2 = parseInt(this.data.page) || this.page) != null ? _ref2 : 1;
-        this.data.size = (_ref3 = parseInt(this.data.size) || this.size) != null ? _ref3 : 10;
+        this.data.page = (_ref1 = parseInt(this.data.page) || this.page) != null ? _ref1 : 1;
+        this.data.size = (_ref2 = parseInt(this.data.size) || this.size) != null ? _ref2 : 10;
         this.on("updated", this.refreshPagination);
       }
       if (this.loading) {
@@ -444,8 +443,9 @@ Optionally it supports pagination, search, and any number of filters
 
     Filter.prototype.className = "pull-left tableview-filterbox";
 
-    Filter.prototype.initialize = function() {
+    Filter.prototype.initialize = function(options) {
       var _this = this;
+      this.options = options;
       this.id = this.options.id;
       this.extraId = this.options.extraId;
       this.setData = this.options.setData;

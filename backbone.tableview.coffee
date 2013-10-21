@@ -129,8 +129,8 @@ class Backbone.TableView extends Backbone.View
         "click  .pager-next:not(.disabled)": "nextPage"
 
     # Parse initial data, hook up to collection's events
-    initialize: ->
-        for key, val of @options
+    initialize: (options) ->
+        for key, val of options
             this[key] = val
 
         myFilters =
@@ -372,7 +372,8 @@ class Backbone.TableView.Filter extends Backbone.View
     tagName: "div"
     className: "pull-left tableview-filterbox"
 
-    initialize: ->
+    initialize: (options) ->
+        @options = options
         @id = @options.id
         @extraId = @options.extraId
         @setData = @options.setData
